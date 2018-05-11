@@ -1,0 +1,42 @@
+{
+  "name": "AlphaDrive Browser Connector",
+  "short_name": "AD4Chrome",
+  "description": "http://www.AlphaDriveForClio.com",
+  "version": "18.03.3.245",
+  "manifest_version": 2,
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://app.clio.com/*",
+        "https://app.goclio.eu/*",
+        "https://*.app.clio.com/*",
+        "https://*.app.goclio.eu/*"
+      ],
+      "js": [
+        "scriptinjector.js"
+      ],
+      "run_at": "document_end",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    "script.js"
+  ],
+  "icons": {
+    "64": "icon-0064.png"
+  },
+  "browser_action": {
+    "default_icon": "icon-0064.png",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "storage",
+    "notifications"
+  ],
+  "author": "Hank Yang"
+}

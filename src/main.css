@@ -1,0 +1,2 @@
+#momane_toast {
+    position: fixed;top: 5px;right: 10px;width: 400px;padding: 10px;background-color: gray;border: 1px solid gray;box-shadow: 10px 10px 1px 5px gray;font-size: 11px;}
