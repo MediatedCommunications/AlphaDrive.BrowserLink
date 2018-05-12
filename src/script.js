@@ -6,8 +6,8 @@
       sendMessageToTop({cmd: "showToast"});
     } else {
       sendMessageToTop({cmd: "showToast"});
-      let newlink = 'alphadrive://localhost/Remoting/AlphaDrive.Services.Remoting.IDocumentServiceUI/rest/ShellExecuteDocument?Document1Id=' + child.id + '&Document1IdType=DocumentID';
-      window.location = newlink;
+      // window.location = 'alphadrive://localhost/Remoting/AlphaDrive.Services.Remoting.IDocumentServiceUI/rest/ShellExecuteDocument?Document1Id=' + child.id + '&Document1IdType=DocumentID';
+      window.open('alphadrive://localhost/Remoting/AlphaDrive.Services.Remoting.IDocumentServiceUI/rest/ShellExecuteDocument?Document1Id=' + child.id + '&Document1IdType=DocumentID');
     }
 
   }
@@ -37,13 +37,6 @@ window.addEventListener("message", function (message) {
 
 
 function showToast(text) {
-  // let theToast = document.querySelector("#momane_toast");
-  // theToast.style.display = "block";
-  // theToast.innerHTML = text;
-  // setTimeout(() => {
-  //     theToast.style.display = "none";
-  // }, 5000)
-  // messageToBack({cmd:"notify"});
 }
 
 function rewritePage() {
@@ -51,20 +44,22 @@ function rewritePage() {
   var Done = false;
   Tries += 1;
 
-  var nodes = document.evaluate("//div[@ng-view]", document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE);
-  for (var index = 0; index < nodes.snapshotLength; ++index) {
-    Done = true;
-
-    var node = nodes.snapshotItem(index);
-    var scope = window.angular.element(node).scope();
-    scope.downloadItem = newDownloadItem(scope.downloadItem);
+  let nodes = document.querySelectorAll("a[e-form='documentNameForm']");
+  if (nodes) {
+    nodes.forEach(node => {
+      console.log("hello");
+      let scope = window.angular.element(node).scope();
+      scope.itemClicked = newDownloadItem(scope.itemClicked);
+    });
   }
 
   if (Done || Tries >= 10) {
-    clearInterval(PageRewriterInterval);
+    // clearInterval(PageRewriterInterval);
   }
-
 }
+
+
+
 
 var PageRewriterInterval = setInterval(rewritePage, 1000);
 
