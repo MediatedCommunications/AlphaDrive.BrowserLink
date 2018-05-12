@@ -1,0 +1,35 @@
+{
+  "name": "AlphaDriveChromeExtension_chrome_0112",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.4.0",
+    "gulp-zip": "^4.1.0"
+  },
+  "devDependencies": {
+    "dot-json": "^1.0.3",
+    "web-ext": "^2.2.2",
+    "xo": "^0.18.2"
+  },
+  "scripts": {
+    "test": "xo",
+    "fix": "xo --fix",
+    "build": "npm run update-version && npm run zip",
+    "update-version": "VERSION=$(date -u +%y.%m.%-d.%-H%M); echo $VERSION; dot-json src/manifest.json version $VERSION",
+    "zip": "web-ext build --source-dir src --artifacts-dir dist"
+
+  },
+  "xo": {
+    "envs": [
+      "webextensions",
+      "browser",
+      "jquery"
+    ],
+    "ignores": [
+      "dist",
+      "src/lib/jquery*"
+    ]
+  }
+}
