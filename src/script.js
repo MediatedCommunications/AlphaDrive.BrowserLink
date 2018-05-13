@@ -53,8 +53,8 @@ function rewritePage() {
     });
   }
 
-  if (Done || Tries >= 10) {
-    // clearInterval(PageRewriterInterval);
+  if (Done || Tries >= 100) {
+    clearInterval(PageRewriterInterval);
   }
 }
 

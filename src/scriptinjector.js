@@ -22,10 +22,6 @@ chrome.storage.local.get("IsDisabled", i => {
 });
 
 
-/*
-var node = nodes[0].node;
-var frame = nodes[0].frame;
-*/
 var PageRewriterInterval = setInterval(rewritePage, 1000);
 chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
   if (req.cmd === "changeOpen") {
