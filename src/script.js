@@ -6,8 +6,8 @@
       sendMessageToTop({cmd: "showToast"});
     } else {
       sendMessageToTop({cmd: "showToast"});
-      // window.location = 'alphadrive://localhost/Remoting/AlphaDrive.Services.Remoting.IDocumentServiceUI/rest/ShellExecuteDocument?Document1Id=' + child.id + '&Document1IdType=DocumentID';
-      window.open('alphadrive://localhost/Remoting/AlphaDrive.Services.Remoting.IDocumentServiceUI/rest/ShellExecuteDocument?Document1Id=' + child.id + '&Document1IdType=DocumentID');
+      window.location = 'alphadrive://localhost/Remoting/AlphaDrive.Services.Remoting.IDocumentServiceUI/rest/ShellExecuteDocument?Document1Id=' + child.id + '&Document1IdType=DocumentID';
+      // window.open('alphadrive://localhost/Remoting/AlphaDrive.Services.Remoting.IDocumentServiceUI/rest/ShellExecuteDocument?Document1Id=' + child.id + '&Document1IdType=DocumentID');
     }
 
   }

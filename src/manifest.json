@@ -2,7 +2,7 @@
   "name": "AlphaDrive Browser Connector",
   "short_name": "AD4Chrome",
   "description": "http://www.AlphaDriveForClio.com",
-  "version": "18.05.12.1318",
+  "version": "18.05.13.330",
   "manifest_version": 2,
   "background": {
     "scripts": [
