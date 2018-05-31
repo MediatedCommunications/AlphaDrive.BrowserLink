@@ -18,7 +18,13 @@ chrome.storage.local.get("IsDisabled", i => {
   let hid = document.createElement("span");
   hid.setAttribute("id", "momane_ifOpen");
   hid.setAttribute("data-value", IsDisabled);
-  document.body.appendChild(hid);
+  let c = setInterval(()=>{
+    if(document.body){
+      clearInterval(c);
+        document.body.appendChild(hid);
+    }
+  },10);
+
 });
 
 
@@ -43,7 +49,6 @@ window.addEventListener("message", function (message) {
   } else {
     sendMessageToTop(message.data);
   }
-
 }, false);
 
 
