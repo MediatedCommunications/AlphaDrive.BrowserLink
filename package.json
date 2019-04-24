@@ -1,5 +1,5 @@
 {
-  "name": "alphadrive-ext",
+  "name": "faster-suit-ext",
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
@@ -9,9 +9,9 @@
     "gulp-zip": "^4.1.0"
   },
   "devDependencies": {
-    "dot-json": "^1.0.3",
-    "web-ext": "^2.2.2",
-    "xo": "^0.18.2"
+    "dot-json": "latest",
+    "web-ext": "latest",
+    "xo": "latest"
   },
   "scripts": {
     "test": "xo",

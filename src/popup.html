@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8"/>
   <title>Title</title>
   <style>
     body {
-      width: 300px;
+      width: 400px;
+      padding: 0;
+      margin: 0;
     }
 
     /* The switch - the box around the slider */
     .switch {
       position: relative;
-      display: inline-block;
       width: 60px;
       height: 24px;
       vertical-align: middle;
+      float: right;
+      margin-right: 10px;
     }
 
     /* Hide default HTML checkbox */
@@ -31,8 +34,8 @@
       right: 0;
       bottom: 0;
       background-color: #ccc;
-      -webkit-transition: .4s;
-      transition: .4s;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
     }
 
     .slider:before {
@@ -43,16 +46,16 @@
       left: 6px;
       bottom: 4px;
       background-color: white;
-      -webkit-transition: .4s;
-      transition: .4s;
+      -webkit-transition: 0.4s;
+      transition: 0.4s;
     }
 
     input:checked + .slider {
-      background-color: #2196F3;
+      background-color: #2A579A;
     }
 
     input:focus + .slider {
-      box-shadow: 0 0 1px #2196F3;
+      box-shadow: 0 0 1px #2A579A;
     }
 
     input:checked + .slider:before {
@@ -62,17 +65,68 @@
     }
 
     .title {
-      font-size: 14px;
+      font-size: 12px;
+      line-height: 25px;
+      padding-left: 10px;
+    }
+
+    .bar {
+      width: 100%;
+      background-color: #2A579A;
+      padding: 5px 5px;
+      margin-bottom: 15px;
+      color: white;
+      font-size: 16px;
+    }
+
+    .bar:not(:first-child) {
+      margin-top: 15px;
+    }
+
+    .link {
+      text-align: center;
+      margin-top: 15px;
+      border-top: 1px solid gray;
+      padding: 15px 0;
     }
   </style>
-
+  <script src="assets/js/jquery-3.2.1.js"></script>
 </head>
 <body>
-<span class="title">Open Documents with AlphaDrive:</span>
-<label class="switch">
-  <input type="checkbox" id="openInAD">
-  <span class="slider"></span>
-</label>
+<div class="bar">Clio Options</div>
+<div>
+  <span class="title">Open Documents with Faster Suite:</span>
+  <label class="switch">
+    <input type="checkbox" id="openInAD"/>
+    <span class="slider"></span>
+  </label>
+</div>
+<div>
+  <span class="title">Enhance my Clio Documents Experience:</span>
+  <label class="switch">
+    <input type="checkbox" id="enhanceDoc"/>
+    <span class="slider"></span>
+  </label>
+</div>
+
+<div class="bar">PACER Options</div>
+<div>
+  <span class="title">Automatically Save and Archive PACER Document:</span>
+  <label class="switch">
+    <input type="checkbox" id="autoSave"/>
+    <span class="slider"></span>
+  </label>
+</div>
+<div>
+  <span class="title">Notify me when files are archived:</span>
+  <label class="switch">
+    <input type="checkbox" id="notifySave"/>
+    <span class="slider"></span>
+  </label>
+</div>
+<div class="link">
+  <a href="https://www.fasterlaw.com" target="_blank">https://www.FasterLaw.com</a>
+</div>
 <script src="popup.js"></script>
 </body>
 </html>
