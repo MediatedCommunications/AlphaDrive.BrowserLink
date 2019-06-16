@@ -1,21 +1,20 @@
 ﻿function newDownloadItem(oldDownloadItem) {
   return function(child) {
+    const docId = child.id;
     let IsDisabled =
       document.querySelector("#momane_ifOpen").getAttribute("data-value") ===
       "true";
     if (IsDisabled) {
-      oldDownloadItem(child);
-      sendMessageToTop({
-        cmd: "showToast"
-      });
+      // oldDownloadItem(child);
+      window.location = `clio://launcher/edit/${child.id}`;
+      // sendMessageToTop({
+      //   cmd: "showToast"
+      // });
     } else {
-      sendMessageToTop({
-        cmd: "showToast"
-      });
-      window.location =
-        "alphadrive://localhost/Remoting/AlphaDrive.Services.Remoting.IDocumentServiceUI/rest/ShellExecuteDocument?Document1Id=" +
-        child.id +
-        "&Document1IdType=DocumentID";
+      // sendMessageToTop({
+      //   cmd: "showToast"
+      // });
+      window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docId}`;
     }
   };
 }
@@ -68,7 +67,7 @@ function rewritePage() {
           "momane_out",
           "fa-external-link-square",
           "Open this document using Faster Suite",
-          `alphadrive://localhost/Remoting/AlphaDrive.Services.Remoting.IDocumentServiceUI/rest/ShellExecuteDocument?Document1Id=${docID}&Document1IdType=DocumentID`
+          `clio://launcher/edit/${docID}`
         );
         let downloadIcon = createIcon(
           "momane_download",
@@ -94,6 +93,12 @@ function rewritePage() {
           "Open this document's folder using Faster Suite",
           `alphadrive://localhost/Remoting/custom_actions/documents/locate?subject_url=/api/v4/documents/${docID}`
         );
+        let fasterLaw = createIcon(
+          "momane_fastlaw",
+          "fasterlaw",
+          "Open this document with Faster Suite",
+          `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`
+        );
         // outIcon.setAttribute("ng-click", scope.itemClicked);
         downloadIcon.onclick = function() {
           scope.itemClicked(scope.child);
@@ -103,14 +108,15 @@ function rewritePage() {
           let outScope = window.angular.element().scope();
           link.click();
         };
+        p.prepend(outIcon);
         p.prepend(downloadIcon);
         p.prepend(compareIcon);
         p.prepend(copyIcon);
         p.prepend(locateIcon);
-        p.prepend(outIcon);
+        p.prepend(fasterLaw);
         link.style.display = "none";
       }
-      // scope.itemClicked = newDownloadItem(scope.itemClicked);
+      scope.itemClicked = newDownloadItem(scope.itemClicked);
     });
   }
 

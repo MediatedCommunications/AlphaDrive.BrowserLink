@@ -23,17 +23,17 @@ let content_delegate = new ContentDelegate(
 );
 
 if (PACER.hasPacerCookie(document.cookie)) {
-  // If this is a docket query page, ask FasterLaw whether it has the docket page.
+  // If this is a docket query page, ask Faster Law whether it has the docket page.
   content_delegate.handleDocketQueryUrl();
 
-  // If this is a docket page, upload it to FasterLaw.
+  // If this is a docket page, upload it to Faster Law.
   content_delegate.handleDocketDisplayPage();
 
   // If this is a document's menu of attachments (subdocuments), upload it to
-  // FasterLaw.
+  // Faster Law.
   content_delegate.handleAttachmentMenuPage();
 
-  // If this page offers a single document, ask FasterLaw whether it has the document.
+  // If this page offers a single document, ask Faster Law whether it has the document.
   content_delegate.handleSingleDocumentPageCheck();
 
   // If this page offers a single document, intercept navigation to the document
@@ -41,9 +41,9 @@ if (PACER.hasPacerCookie(document.cookie)) {
   // creates a <form> element and calls submit() on it, so we hook into submit().
   content_delegate.handleSingleDocumentPageView();
 
-  // Check every link in the document to see if there is a free FasterLaw document
-  // available. If there is, put a link with a FasterLaw icon.
+  // Check every link in the document to see if there is a free Faster Law document
+  // available. If there is, put a link with a Faster Law icon.
   content_delegate.attachRecapLinkToEligibleDocs();
 } else {
-  console.info(`FasterLaw: Taking no actions because not logged in: ` + url);
+  console.info(`Faster Law: Taking no actions because not logged in: ` + url);
 }

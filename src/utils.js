@@ -142,7 +142,7 @@ $.ajaxSetup({
       // If you are reading this code, we ask that you please refrain from
       // using this token. Unfortunately, there is no way to distribute
       // extensions that use hardcoded tokens except through begging and using
-      // funny variable names. Do not abuse the FasterLaw service.
+      // funny variable names. Do not abuse the Faster Law service.
       let asdf = "45c7946dd8400ad62662565cf79da3c081d9b0e5";
       xhr.setRequestHeader("Authorization", `Token ${asdf}`);
     }
@@ -172,7 +172,7 @@ var DEBUGLEVEL = 1;
 function debug(level, varargs) {
   if (DEBUGLEVEL >= level) {
     var args = Array.prototype.slice.call(arguments, 1);
-    args[0] = `FasterLaw debug [${level}]: ` + args[0];
+    args[0] = `Faster Law debug [${level}]: ` + args[0];
     return console.log.apply(this, args);
   }
 }

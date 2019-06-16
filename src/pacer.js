@@ -48,7 +48,7 @@ let PACER = {
     return PACER_TO_CL_IDS[pacer_court_id] || pacer_court_id;
   },
 
-  // Returns true if the given URL looks like a link to a PACER document.
+  // Returns true if the given URL looks like a link to a PACER documents.
   // For CMECF District:
   //   https://ecf.dcd.uscourts.gov/doc1/04503837920
   // For CMECF Appellate:

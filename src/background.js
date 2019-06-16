@@ -70,7 +70,7 @@ exportInstance(Recap);
 function setDefaultOptions(details) {
   chrome.storage.local.get("options", function(items) {
     console.debug(
-      "FasterLaw: Attempted to get 'options' key from local storage. Got: " +
+      "Faster Law: Attempted to get 'options' key from local storage. Got: " +
         items
     );
     let defaults = {

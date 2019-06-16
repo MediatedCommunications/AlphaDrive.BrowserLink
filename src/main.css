@@ -10,10 +10,18 @@
   font-size: 11px;
 }
 
-.momane_search, .momane_compare, .momane_download, .momane_out, .momane_link {
+.momane_search, .momane_compare, .momane_download, .momane_out, .momane_link, .fasterlaw {
   text-decoration: none;
 }
 
-.momane_search:hover, .momane_compare:hover, .momane_download:hover, .momane_out:hover, .momane_link:hover {
+.momane_search:hover, .momane_compare:hover, .momane_download:hover, .momane_out:hover, .momane_link:hover, .fasterlaw:hover {
   text-decoration: none;
+}
+
+.fasterlaw{
+  background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/icon-0128.png");
+  width: 18px;
+  height: 18px;
+  background-size: contain;
+  background-repeat: no-repeat;
 }

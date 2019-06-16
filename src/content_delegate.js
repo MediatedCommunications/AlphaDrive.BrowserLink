@@ -75,14 +75,14 @@ ContentDelegate.prototype.checkRestrictions = function() {
   }
 
   if (restrictedDoc) {
-    console.log("FasterLaw: Restricted document detected. Skipping upload.");
+    console.log("Faster Law: Restricted document detected. Skipping upload.");
     // We would like to alter the [R] icon to indicate what's going
     // on, but we cannot call chrome.browserAction.setIcon()
     // here. Instead, we'd need to send a message to the background
     // script? ughhhh. Punt for now.
 
-    // Insert a FasterLaw banner near the end of the form, before the action button.
-    // Ideally this would have some FasterLaw branding, icon/logo, etc.
+    // Insert a Faster Law banner near the end of the form, before the action button.
+    // Ideally this would have some Faster Law branding, icon/logo, etc.
 
     // Ideally we target the form <input>, but absent that
     // we just go to the end of the final form.
@@ -103,7 +103,7 @@ ContentDelegate.prototype.checkRestrictions = function() {
                     )}"
                          style="width: auto; height: auto">
                   </div>
-                  <div style="display: table-cell; vertical-align: middle">This document <b>will not be uploaded</b> to the FasterLaw Archive because the FasterLaw extension has detected that it may be restricted from public distribution.
+                  <div style="display: table-cell; vertical-align: middle">This document <b>will not be uploaded</b> to the Faster Law Archive because the Faster Law extension has detected that it may be restricted from public distribution.
                   </div>
                 </div>
               </div>
@@ -156,14 +156,14 @@ ContentDelegate.prototype.findAndStorePacerDocIds = function() {
   }
   chrome.storage.local.set(docsToCases, function() {
     console.info(
-      `FasterLaw: Saved the pacer_doc_id to pacer_case_id mappings to local ` +
+      `Faster Law: Saved the pacer_doc_id to pacer_case_id mappings to local ` +
         `storage: ` +
         Object.keys(docsToCases).length
     );
   });
 };
 
-// If this is a docket query page, ask FasterLaw whether it has the docket page.
+// If this is a docket query page, ask Faster Law whether it has the docket page.
 ContentDelegate.prototype.handleDocketQueryUrl = function() {
   if (!PACER.isDocketQueryUrl(this.url)) {
     return;
@@ -178,22 +178,22 @@ ContentDelegate.prototype.handleDocketQueryUrl = function() {
     result
   ) {
     if (result.count === 0) {
-      console.warn(`FasterLaw: Zero results found for docket lookup.`);
+      console.warn(`Faster Law: Zero results found for docket lookup.`);
       return;
     } else if (!(result.count === 1)) {
       console.error(
-        `FasterLaw: More than one result found for docket lookup. Found ` +
+        `Faster Law: More than one result found for docket lookup. Found ` +
           `${result.count}`
       );
       return;
     }
     let first_result = result.results[0];
 
-    // Insert a FasterLaw download link at the bottom of the form.
+    // Insert a Faster Law download link at the bottom of the form.
     $('<div class="recap-banner"/>')
       .append(
         $("<a/>", {
-          title: "Docket is available for free in the FasterLaw Archive.",
+          title: "Docket is available for free in the Faster Law Archive.",
           target: "_blank",
           href: "https://www.courtlistener.com" + first_result.absolute_url
         })
@@ -209,7 +209,7 @@ ContentDelegate.prototype.handleDocketQueryUrl = function() {
               title: first_result.date_modified
             }).append(first_result.date_modified)
           )
-          .append(" for free from FasterLaw")
+          .append(" for free from Faster Law")
       )
       .append(
         $("<br><small>Note that archived dockets may be out of date.</small>")
@@ -218,7 +218,7 @@ ContentDelegate.prototype.handleDocketQueryUrl = function() {
   });
 };
 
-// If this is a docket page, upload it to FasterLaw.
+// If this is a docket page, upload it to Faster Law.
 ContentDelegate.prototype.handleDocketDisplayPage = function() {
   if (history.state && history.state.uploaded) {
     return;
@@ -243,7 +243,7 @@ ContentDelegate.prototype.handleDocketDisplayPage = function() {
           if (ok) {
             history.replaceState({ uploaded: true }, "");
             this.notifier.showUpload(
-              "Docket uploaded to the public FasterLaw Archive.",
+              "Docket uploaded to the public Faster Law Archive.",
               function() {}
             );
           }
@@ -266,14 +266,16 @@ ContentDelegate.prototype.handleDocketDisplayPage = function() {
           );
         }
       } else {
-        console.info(`FasterLaw: Not uploading docket. FasterLaw is disabled.`);
+        console.info(
+          `Faster Law: Not uploading docket. Faster Law is disabled.`
+        );
       }
     }.bind(this)
   );
 };
 
 // If this is a document's menu of attachments (subdocuments), upload it to
-// FasterLaw.
+// Faster Law.
 ContentDelegate.prototype.handleAttachmentMenuPage = function() {
   if (history.state && history.state.uploaded) {
     return;
@@ -291,7 +293,7 @@ ContentDelegate.prototype.handleAttachmentMenuPage = function() {
           if (ok) {
             history.replaceState({ uploaded: true }, "");
             this.notifier.showUpload(
-              "Menu page uploaded to the public FasterLaw Archive.",
+              "Menu page uploaded to the public Faster Law Archive.",
               function() {}
             );
           }
@@ -305,14 +307,14 @@ ContentDelegate.prototype.handleAttachmentMenuPage = function() {
         );
       } else {
         console.info(
-          "FasterLaw: Not uploading attachment menu. FasterLaw is disabled."
+          "Faster Law: Not uploading attachment menu. Faster Law is disabled."
         );
       }
     }.bind(this)
   );
 };
 
-// If this page offers a single document, ask FasterLaw whether it has the document.
+// If this page offers a single document, ask Faster Law whether it has the document.
 ContentDelegate.prototype.handleSingleDocumentPageCheck = function() {
   if (!PACER.isSingleDocumentPage(this.url, document)) {
     return;
@@ -320,7 +322,7 @@ ContentDelegate.prototype.handleSingleDocumentPageCheck = function() {
 
   let callback = $.proxy(function(api_results) {
     console.info(
-      `FasterLaw: Got results from API. Running callback on API results to ` +
+      `Faster Law: Got results from API. Running callback on API results to ` +
         `insert link`
     );
     let result = api_results.results.filter(function(obj) {
@@ -331,11 +333,11 @@ ContentDelegate.prototype.handleSingleDocumentPageCheck = function() {
     }
 
     let href = "https://www.courtlistener.com/" + result.filepath_local;
-    // Insert a FasterLaw download link at the bottom of the form.
+    // Insert a Faster Law download link at the bottom of the form.
     $('<div class="recap-banner"/>')
       .append(
         $("<a/>", {
-          title: "Document is available for free in the FasterLaw Archive.",
+          title: "Document is available for free in the Faster Law Archive.",
           href: href
         })
           .append(
@@ -398,7 +400,7 @@ ContentDelegate.prototype.onDocumentViewSubmit = function(event) {
     data,
     function(type, ab, xhr) {
       console.info(
-        'FasterLaw: Successfully submitted FasterLaw "View" button form: ' +
+        'Faster Law: Successfully submitted Faster Law "View" button form: ' +
           xhr.statusText
       );
       var blob = new Blob([new Uint8Array(ab)], { type: type });
@@ -441,7 +443,7 @@ ContentDelegate.prototype.onDocumentViewSubmit = function(event) {
 
 // Given the HTML for a page with an <iframe> in it, downloads the PDF
 // document in the iframe, displays it in the browser, and also
-// uploads the PDF document to FasterLaw.
+// uploads the PDF document to Faster Law.
 //
 // The documentElement is provided via dependency injection so that it
 // can be properly mocked in tests.
@@ -472,7 +474,7 @@ ContentDelegate.prototype.showPdfPage = function(
     null,
     function(type, ab, xhr) {
       console.info(
-        "FasterLaw: Successfully got PDF as arraybuffer via ajax request."
+        "Faster Law: Successfully got PDF as arraybuffer via ajax request."
       );
 
       // Make the Back button redisplay the previous page.
@@ -490,7 +492,7 @@ ContentDelegate.prototype.showPdfPage = function(
       this.recap.getPacerCaseIdFromPacerDocId(
         this.pacer_doc_id,
         function(pacer_case_id) {
-          console.info(`FasterLaw: Stored pacer_case_id is ${pacer_case_id}`);
+          console.info(`Faster Law: Stored pacer_case_id is ${pacer_case_id}`);
           let displayPDF = function(items) {
             let filename;
             if (items.options.ia_style_filenames) {
@@ -561,13 +563,13 @@ ContentDelegate.prototype.showPdfPage = function(
 
           let uploadDocument = function(items) {
             if (!items["options"]["recap_disabled"] && !this.restricted) {
-              // If we have the pacer_case_id, upload the file to FasterLaw.
+              // If we have the pacer_case_id, upload the file to Faster Law.
               // We can't pass an ArrayBuffer directly to the background
               // page, so we have to convert to a regular array.
               let onUploadOk = function(ok) {
                 if (ok) {
                   this.notifier.showUpload(
-                    "PDF uploaded to the public FasterLaw Archive.",
+                    "PDF uploaded to the public Faster Law Archive.",
                     function() {}.bind(this)
                   );
                 }
@@ -589,7 +591,7 @@ ContentDelegate.prototype.showPdfPage = function(
               );
             } else {
               console.info(
-                "FasterLaw: Not uploading PDF. FasterLaw is disabled."
+                "Faster Law: Not uploading PDF. Faster Law is disabled."
               );
             }
           }.bind(this);
@@ -658,14 +660,14 @@ ContentDelegate.prototype.handleRecapLinkClick = function(window_obj, url) {
           onclick:
             "var d = document; d.body.removeChild(this.parentNode); " +
             'd.body.removeChild(d.getElementById("recap-shade"))'
-        }).append(" Get this document for free from FasterLaw.")
+        }).append(" Get this document for free from Faster Law.")
       )
       .append(
         $(
           "<br><br><small>Note that archived documents may be out of date. " +
-            "FasterLaw is not affiliated with the U.S. Courts. The documents " +
+            "Faster Law is not affiliated with the U.S. Courts. The documents " +
             "it makes available are voluntarily uploaded by PACER users. " +
-            "FasterLaw cannot guarantee the authenticity of documents because the " +
+            "Faster Law cannot guarantee the authenticity of documents because the " +
             "courts provide no effective document authentication system.</small>"
         )
       )
@@ -674,24 +676,24 @@ ContentDelegate.prototype.handleRecapLinkClick = function(window_obj, url) {
   return false;
 };
 
-// Check every link in the document to see if there is a free FasterLaw document
-// available. If there is, put a link with a FasterLaw icon.
+// Check every link in the document to see if there is a free Faster Law document
+// available. If there is, put a link with a Faster Law icon.
 ContentDelegate.prototype.attachRecapLinkToEligibleDocs = function() {
   let linkCount = this.pacer_doc_ids.length;
   console.info(
-    `FasterLaw: Attaching links to all eligible documents (${linkCount} found)`
+    `Faster Law: Attaching links to all eligible documents (${linkCount} found)`
   );
   if (linkCount === 0) {
     return;
   }
 
-  // Ask the server whether any of these documents are available from FasterLaw.
+  // Ask the server whether any of these documents are available from Faster Law.
   this.recap.getAvailabilityForDocuments(
     this.pacer_doc_ids,
     this.court,
     $.proxy(function(api_results) {
       console.info(
-        `FasterLaw: Got results from API. Running callback on API results to ` +
+        `Faster Law: Got results from API. Running callback on API results to ` +
           `attach links and icons where appropriate.`
       );
       for (let i = 0; i < this.links.length; i++) {

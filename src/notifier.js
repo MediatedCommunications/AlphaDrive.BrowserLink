@@ -2,7 +2,7 @@
 function Notifier() {
   var showNotification = function(title, message, cb) {
     console.info(
-      "FasterLaw: Running showNotification function. Expect a notification."
+      "Faster Law: Running showNotification function. Expect a notification."
     );
     var notificationOptions = {
       type: "basic",
@@ -27,7 +27,7 @@ function Notifier() {
     showUpload: function(message, cb) {
       chrome.storage.local.get("options", function(items) {
         if (items.options.show_notifications) {
-          showNotification("FasterLaw upload", message, cb);
+          showNotification("Faster Law upload", message, cb);
         }
       });
     },
@@ -36,7 +36,7 @@ function Notifier() {
       chrome.storage.local.get("options", function(items) {
         if (items.options.show_notifications) {
           showNotification(
-            active ? "FasterLaw is active" : "FasterLaw is inactive",
+            active ? "Faster Law is active" : "Faster Law is inactive",
             message,
             cb
           );
