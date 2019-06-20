@@ -193,7 +193,7 @@ ContentDelegate.prototype.handleDocketQueryUrl = function() {
     $('<div class="recap-banner"/>')
       .append(
         $("<a/>", {
-          title: "Docket is available for free in the Faster Law Archive.",
+          title: "Docket is available for free",
           target: "_blank",
           href: "https://www.courtlistener.com" + first_result.absolute_url
         })
@@ -209,7 +209,7 @@ ContentDelegate.prototype.handleDocketQueryUrl = function() {
               title: first_result.date_modified
             }).append(first_result.date_modified)
           )
-          .append(" for free from Faster Law")
+          .append(" for free")
       )
       .append(
         $("<br><small>Note that archived dockets may be out of date.</small>")
@@ -337,7 +337,7 @@ ContentDelegate.prototype.handleSingleDocumentPageCheck = function() {
     $('<div class="recap-banner"/>')
       .append(
         $("<a/>", {
-          title: "Document is available for free in the Faster Law Archive.",
+          title: "Document is available for free",
           href: href
         })
           .append(
@@ -660,7 +660,7 @@ ContentDelegate.prototype.handleRecapLinkClick = function(window_obj, url) {
           onclick:
             "var d = document; d.body.removeChild(this.parentNode); " +
             'd.body.removeChild(d.getElementById("recap-shade"))'
-        }).append(" Get this document for free from Faster Law.")
+        }).append(" Get this document for free.")
       )
       .append(
         $(

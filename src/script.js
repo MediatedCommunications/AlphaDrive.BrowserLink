@@ -66,7 +66,7 @@ function rewritePage() {
         let outIcon = createIcon(
           "momane_out",
           "fa-external-link-square",
-          "Open this document using Faster Suite",
+          "Open this document with Clio Launcher",
           `clio://launcher/edit/${docID}`
         );
         let downloadIcon = createIcon(
