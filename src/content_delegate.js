@@ -103,7 +103,7 @@ ContentDelegate.prototype.checkRestrictions = function() {
                     )}"
                          style="width: auto; height: auto">
                   </div>
-                  <div style="display: table-cell; vertical-align: middle">This document <b>will not be uploaded</b> to the Faster Law Archive because the Faster Law extension has detected that it may be restricted from public distribution.
+                  <div style="display: table-cell; vertical-align: middle">This document <b>will not be uploaded</b> because the Faster Law extension has detected that it may be restricted from public distribution.
                   </div>
                 </div>
               </div>
@@ -243,7 +243,7 @@ ContentDelegate.prototype.handleDocketDisplayPage = function() {
           if (ok) {
             history.replaceState({ uploaded: true }, "");
             this.notifier.showUpload(
-              "Docket uploaded to the public Faster Law Archive.",
+              "Docket uploaded",
               function() {}
             );
           }
@@ -293,7 +293,7 @@ ContentDelegate.prototype.handleAttachmentMenuPage = function() {
           if (ok) {
             history.replaceState({ uploaded: true }, "");
             this.notifier.showUpload(
-              "Menu page uploaded to the public Faster Law Archive.",
+              "Menu page uploaded",
               function() {}
             );
           }
@@ -569,7 +569,7 @@ ContentDelegate.prototype.showPdfPage = function(
               let onUploadOk = function(ok) {
                 if (ok) {
                   this.notifier.showUpload(
-                    "PDF uploaded to the public Faster Law Archive.",
+                    "PDF uploaded",
                     function() {}.bind(this)
                   );
                 }

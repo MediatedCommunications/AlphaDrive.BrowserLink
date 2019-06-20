@@ -174,7 +174,7 @@ function Recap() {
       cb
     ) {
       console.info(
-        `Faster Law: Attempting PDF upload to Faster Law Archive with details: ` +
+        `Faster Law: Attempting PDF upload with details: ` +
           `pacer_court: ${pacer_court}, pacer_case_id: ` +
           `${pacer_case_id}, pacer_doc_id: ${pacer_doc_id}, ` +
           `document_number: ${document_number}, ` +
