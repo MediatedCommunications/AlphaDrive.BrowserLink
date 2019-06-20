@@ -2,7 +2,7 @@
   "name": "Faster Suite Browser Link",
   "short_name": "AD4Chrome",
   "description": "Open documents straight from Clio, get free PACER looks, and much, much more.\n",
-  "version": "19.06.16.757",
+  "version": "19.06.20.327",
   "manifest_version": 2,
   "background": {
     "scripts": [
