@@ -101,11 +101,11 @@ function rewritePage() {
         );
         // outIcon.setAttribute("ng-click", scope.itemClicked);
         downloadIcon.onclick = function() {
-          scope.itemClicked(scope.child);
+          let id = scope.child.id
+          window.open(`https://app.clio.com/iris/documents/${id}/download`)
         };
         let link = p.querySelector(".external-application-links");
         outIcon.onclick = function() {
-          let outScope = window.angular.element().scope();
           link.click();
         };
         p.prepend(outIcon);
@@ -116,6 +116,7 @@ function rewritePage() {
         p.prepend(fasterLaw);
         link.style.display = "none";
       }
+      
       scope.itemClicked = newDownloadItem(scope.itemClicked);
     });
   }
