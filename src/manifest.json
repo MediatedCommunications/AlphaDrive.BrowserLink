@@ -6,7 +6,7 @@
   "manifest_version": 2,
   "background": {
     "scripts": [
-      "assets/js/jquery-3.2.1.js",
+      "assets/js/jquery-3.4.1.min.js",
       "utils.js",
       "notifier.js",
       "toolbar_button.js",
@@ -46,7 +46,7 @@
         "assets/css/font-awesome.css"
       ],
       "js": [
-        "assets/js/jquery-3.2.1.js",
+        "assets/js/jquery-3.4.1.min.js",
         "assets/js/FileSaver.js",
         "assets/js/moment.js",
         "assets/js/livestamp.js",
