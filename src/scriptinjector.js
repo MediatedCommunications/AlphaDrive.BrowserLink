@@ -9,7 +9,7 @@
 }
 
 function rewritePage() {
-  injectScript(document, chrome.extension.getURL("script.js"), "body");
+  injectScript(document, chrome.extension.getURL("clio-docs.js"), "body");
   clearInterval(PageRewriterInterval);
   return;
 }
