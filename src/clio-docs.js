@@ -53,61 +53,7 @@ function clioDocsRewriter() {
 
       if (!p.querySelector('.momane_out')) {
         let fasterLawIcon = createFasterLawIcon(docID, link);
-        p.prepend(fasterLawIcon);
-        // let outIcon = createIcon(
-        //   'momane_out',
-        //   'fa-external-link-square',
-        //   'Open this document with Clio Launcher',
-        //   `clio://launcher/edit/${docID}`
-        // );
-        // let downloadIcon = createIcon(
-        //   'momane_download',
-        //   'fa-download',
-        //   'Download this document',
-        //   p.baseURI
-        // );
-        // let compareIcon = createIcon(
-        //   'momane_compare',
-        //   'fa-adjust',
-        //   'Compare this document using Faster Suite',
-        //   `alphadrive://localhost/Remoting/custom_actions/documents/compare?subject_url=/api/v4/documents/${docID}`
-        // );
-        // let copyIcon = createIcon(
-        //   'momane_link',
-        //   'fa-link',
-        //   'Copy a link to this document using Faster Suite',
-        //   `alphadrive://localhost/Remoting/custom_actions/documents/share/link?subject_url=/api/v4/documents/${docID}`
-        // );
-        // let locateIcon = createIcon(
-        //   'momane_search',
-        //   'fa-folder-open',
-        //   "Open this document's folder using Faster Suite",
-        //   `alphadrive://localhost/Remoting/custom_actions/documents/locate?subject_url=/api/v4/documents/${docID}`
-        // );
-        // let fasterLaw = createIcon(
-        //   'momane_fastlaw',
-        //   'fasterlaw',
-        //   'Open this document with Faster Suite',
-        //   `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`
-        // );
-        // outIcon.setAttribute("ng-click", scope.itemClicked);
-        // downloadIcon.onclick = function () {
-        //   let id = scope.child.id;
-        //   window.open(`https://app.clio.com/iris/documents/${id}/download`);
-        // };
-        // let link = p.querySelector('.external-application-links');
-        
-        // outIcon.onclick = function () {
-        //   link.click();
-        // };
-        // p.prepend(outIcon);
-        // p.prepend(downloadIcon);
-        // p.prepend(compareIcon);
-        // p.prepend(copyIcon);
-        // p.prepend(locateIcon);
-        // p.prepend(fasterLaw);
-        
-        // link.style.display = 'none';
+        p.prepend(fasterLawIcon);       
       }
       scope.itemClicked = newDownloadItem(scope.itemClicked);
     });
@@ -216,16 +162,9 @@ function newDownloadItem(oldDownloadItem) {
     let IsDisabled =
       document.querySelector('#momane_ifOpen').getAttribute('data-value') ===
       'true';
-    if (IsDisabled) {
-      // oldDownloadItem(child);
-      window.location = `clio://launcher/edit/${child.id}`;
-      // sendMessageToTop({
-      //   cmd: "showToast"
-      // });
+    if (IsDisabled) {      
+      window.location = `clio://launcher/edit/${child.id}`;      
     } else {
-      // sendMessageToTop({
-      //   cmd: "showToast"
-      // });
       window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docId}`;
     }
   };
