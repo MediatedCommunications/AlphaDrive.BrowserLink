@@ -1,4 +1,5 @@
 ﻿function injectScript(ownerdoc, file, node) {
+  console.log(ownerdoc, file, node);
   var th = ownerdoc.getElementsByTagName(node)[0];
   var s = ownerdoc.createElement("script");
   s.setAttribute("type", "text/javascript");
@@ -9,8 +10,8 @@
 }
 
 function rewritePage() {
-  injectScript(document, chrome.extension.getURL("clio-docs.js"), "body");
   clearInterval(PageRewriterInterval);
+  injectScript(document, chrome.extension.getURL("clio-docs.js"), "body");  
   return;
 }
 

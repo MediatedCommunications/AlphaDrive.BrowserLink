@@ -56,7 +56,11 @@ function rewritePage() {
   var Done = false;
   Tries += 1;
 
-  let nodes = document.querySelectorAll("a[e-form='documentNameForm']");
+  let nodes = document.querySelectorAll('a[href*="/download"]');
+  // let nodes = document.querySelectorAll("a[e-form='documentNameForm']");
+  console.log(nodes);
+  console.log(getDocID(nodes[0]));
+  
   if (nodes) {
     nodes.forEach(node => {
       let scope = window.angular.element(node).scope();
@@ -104,7 +108,7 @@ function rewritePage() {
           let id = scope.child.id
           window.open(`https://app.clio.com/iris/documents/${id}/download`)
         };
-        let link = p.querySelector(".external-application-links");
+        // let link = p.querySelector(".external-application-links");
         outIcon.onclick = function() {
           link.click();
         };
@@ -114,10 +118,10 @@ function rewritePage() {
         p.prepend(copyIcon);
         p.prepend(locateIcon);
         p.prepend(fasterLaw);
-        link.style.display = "none";
+        // link.style.display = "none";
       }
       
-      scope.itemClicked = newDownloadItem(scope.itemClicked);
+      // scope.itemClicked = newDownloadItem(scope.itemClicked);
     });
   }
 

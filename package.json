@@ -18,7 +18,7 @@
     "fix": "xo --fix",
     "build": "npm run update-version && npm run zip",
     "update-version": "VERSION=$(date -u +%y.%m.%-d.%-H%M); echo $VERSION; dot-json src/manifest.json version $VERSION",
-    "zip": "web-ext build --source-dir src --artifacts-dir dist"
+    "zip": "web-ext build --source-dir src --artifacts-dir dist --overwrite-dest"
   },
   "xo": {
     "envs": [
