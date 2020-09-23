@@ -1,6 +1,5 @@
-let docNodesSearchCompleted = false;
-let docNodesSearchTries = 0;
-
+let initialized = false;
+const observerConfig = { attributes: false, childList: true, subtree: true };
 let toast = document.createElement('div');
 toast.setAttribute('id', 'momane_toast');
 toast.setAttribute(
@@ -24,10 +23,12 @@ window.addEventListener(
   false
 );
 
-const clioDocsRewriterInterval = setInterval(clioDocsRewriter, 1000);
+const observerCallback = function (mutationsList, observer) {
+  if (observer) {
+    observer.disconnect();
+  }
 
-function clioDocsRewriter() {
-  docNodesSearchTries += 1;
+  let isNewUI = false;
 
   const ifRewrite =
     document.querySelector('#momane_enhance').getAttribute('data-value') ===
@@ -38,13 +39,16 @@ function clioDocsRewriter() {
 
   let nodes = document.querySelectorAll("a[e-form='documentNameForm']");
 
-  if (nodes.length > 1 || docNodesSearchTries >= 100) {
-    clearInterval(clioDocsRewriterInterval);
+  if (nodes.length < 1) {
+    nodes = document.querySelectorAll('a[href*="/download"]');
+    isNewUI = true;
   }
 
-  console.log(nodes, docNodesSearchTries);
+  if (nodes.length > 0) {
+    initialized = true;
+  }
 
-  if (nodes) {
+  if (nodes.length > 0 && !isNewUI) {
     nodes.forEach((node) => {
       let scope = window.angular.element(node).scope();
       let p = node.parentNode;
@@ -53,11 +57,41 @@ function clioDocsRewriter() {
 
       if (!p.querySelector('.momane_out')) {
         let fasterLawIcon = createFasterLawIcon(docID, link);
-        p.prepend(fasterLawIcon);       
+        p.prepend(fasterLawIcon);
       }
       scope.itemClicked = newDownloadItem(scope.itemClicked);
     });
   }
+
+  if (nodes.length > 0 && isNewUI) {
+    nodes.forEach((node) => {
+      let p = node.parentNode;
+      let pTd = node.closest('td');
+      const docID = p.getAttribute('id');
+      const link = p.querySelector('.external-application-links');
+
+      if (!p.querySelector('.momane_out')) {
+        let fasterLawIcon = createFasterLawIcon(docID, link);
+        p.prepend(fasterLawIcon);
+      }
+    });
+  }
+
+  if (observer) { 
+    observer.observe(document.body, observerConfig);
+  }  
+};
+
+const initInterval = setInterval(initialize, 1500);
+
+function initialize() {
+  observerCallback();
+
+  if (initialized) {
+    const observer = new MutationObserver(observerCallback);    
+    observer.observe(document.body, observerConfig);
+    clearInterval(initInterval);
+  }  
 }
 
 function createFasterLawIcon(docID, link) {
@@ -76,7 +110,7 @@ function createFasterLawIcon(docID, link) {
   openWithClioAction.innerHTML = 'Open with Clio';
   openWithClioAction.addEventListener('click', function () {
     link.click();
-  });  
+  });
 
   const downloadAction = document.createElement('div');
   downloadAction.classList.add('action');
@@ -84,7 +118,7 @@ function createFasterLawIcon(docID, link) {
   downloadAction.innerHTML = 'Download';
   downloadAction.addEventListener('click', function () {
     window.open(`https://app.clio.com/iris/documents/${docID}/download`);
-  });  
+  });
 
   const compareAction = document.createElement('div');
   compareAction.classList.add('action');
@@ -162,8 +196,8 @@ function newDownloadItem(oldDownloadItem) {
     let IsDisabled =
       document.querySelector('#momane_ifOpen').getAttribute('data-value') ===
       'true';
-    if (IsDisabled) {      
-      window.location = `clio://launcher/edit/${child.id}`;      
+    if (IsDisabled) {
+      window.location = `clio://launcher/edit/${child.id}`;
     } else {
       window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docId}`;
     }
