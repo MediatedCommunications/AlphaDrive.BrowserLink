@@ -1,4 +1,5 @@
 let initialized = false;
+let enhancedNodes = [];
 const observerConfig = { attributes: false, childList: true, subtree: true };
 let toast = document.createElement('div');
 toast.setAttribute('id', 'momane_toast');
@@ -44,12 +45,12 @@ const observerCallback = function (mutationsList, observer) {
     isNewUI = true;
   }
 
-  if (nodes.length > 0) {
-    initialized = true;
-  }
-
   if (nodes.length > 0 && !isNewUI) {
     nodes.forEach((node) => {
+      if (enhancedNodes.includes(node)) {
+        return;
+      }
+
       let scope = window.angular.element(node).scope();
       let p = node.parentNode;
       const docID = getDocID(node);
@@ -65,21 +66,49 @@ const observerCallback = function (mutationsList, observer) {
 
   if (nodes.length > 0 && isNewUI) {
     nodes.forEach((node) => {
+      if (enhancedNodes.includes(node)) {
+        return;
+      }
+
+      node.addEventListener('click', (event) => {
+        let IsDisabled =
+          document
+            .querySelector('#momane_ifOpen')
+            .getAttribute('data-value') === 'true';
+        if (!IsDisabled) {
+          event.preventDefault();
+          window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
+        }
+      });
+
       let p = node.parentNode;
       let pTd = node.closest('td');
+      let pTr = pTd.closest('tr');
+      let targetViewElement = pTr.childNodes[1];
       const docID = p.getAttribute('id');
       const link = p.querySelector('.external-application-links');
 
+      targetViewElement.style.display = 'flex';
+      targetViewElement.style.alignItems = 'center';
+      targetViewElement.style.overflow = 'visible';
+      targetViewElement.style.position = 'relative';
+
       if (!p.querySelector('.momane_out')) {
         let fasterLawIcon = createFasterLawIcon(docID, link);
-        p.prepend(fasterLawIcon);
+        fasterLawIcon.classList.add('new-ui');
+        targetViewElement.append(fasterLawIcon);
       }
     });
   }
 
-  if (observer) { 
+  if (nodes.length > 0) {
+    initialized = true;
+    nodes.forEach((node) => enhancedNodes.push(node));
+  }
+
+  if (observer) {
     observer.observe(document.body, observerConfig);
-  }  
+  }
 };
 
 const initInterval = setInterval(initialize, 1500);
@@ -88,10 +117,10 @@ function initialize() {
   observerCallback();
 
   if (initialized) {
-    const observer = new MutationObserver(observerCallback);    
+    const observer = new MutationObserver(observerCallback);
     observer.observe(document.body, observerConfig);
     clearInterval(initInterval);
-  }  
+  }
 }
 
 function createFasterLawIcon(docID, link) {

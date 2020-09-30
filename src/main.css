@@ -38,6 +38,28 @@
   margin-right: 1em;
 }
 
+.fasterlaw-icon.new-ui {  
+  flex: 0 0 auto;
+  margin: 0 0 0 5px;
+  background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/icon-0128.png");
+  width: 18px;
+  height: 18px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  cursor: pointer;  
+}
+
+.fasterlaw-icon:before {  
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -6px;
+  border: 1px solid #b0bec5;
+  border-radius: 0 3px 3px 0;
+  width: 28px;
+  height: 22px;
+}
+
 .fasterlaw-actions-container {
   position: absolute;  
   top: 18px;
@@ -49,7 +71,7 @@
   opacity: 0;  
   color: #000000;
   background-color: #ffffff;  
-  transition: opacity 0.5s ease-in-out;
+  transition: opacity 0.25s ease-out;
   box-sizing: border-box;
   pointer-events: none;
 }
@@ -57,7 +79,7 @@
 .fasterlaw-actions-container.open { 
   opacity: 1;  
   border: 1px solid rgb(42, 87, 154);
-  z-index: 1000;
+  z-index: 1001;
   pointer-events: all;
 }
 
