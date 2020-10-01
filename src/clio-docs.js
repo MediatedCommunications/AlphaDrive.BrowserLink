@@ -81,10 +81,10 @@ const observerCallback = function (mutationsList, observer) {
         }
       });
 
-      let p = node.parentNode;
-      let pTd = node.closest('td');
-      let pTr = pTd.closest('tr');
-      let targetViewElement = pTr.childNodes[1];
+      const p = node.parentNode;
+      const pTd = node.closest('td');
+      const pTr = pTd.closest('tr');
+      const targetViewElement = pTr.querySelector('cc-document-actions').parentNode;
       const docID = p.getAttribute('id');
       const link = p.querySelector('.external-application-links');
 
