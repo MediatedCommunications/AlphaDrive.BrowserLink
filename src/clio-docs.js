@@ -24,6 +24,12 @@ window.addEventListener(
   false
 );
 
+window.addEventListener('click', (event) => {    
+  if (!event.target.classList.contains('fasterlaw-icon')) {
+    document.querySelectorAll('.fasterlaw-actions-container').forEach(container => container.classList.remove('open'));
+  }  
+});
+
 const observerCallback = function (mutationsList, observer) {
   if (observer) {
     observer.disconnect();
@@ -41,7 +47,7 @@ const observerCallback = function (mutationsList, observer) {
   let nodes = document.querySelectorAll("a[e-form='documentNameForm']");
 
   if (nodes.length < 1) {
-    nodes = document.querySelectorAll('a[href*="/download"]');
+    nodes = document.querySelectorAll('tr a[href*="/download"]');
     isNewUI = true;
   }
 
@@ -86,7 +92,7 @@ const observerCallback = function (mutationsList, observer) {
       const pTr = pTd.closest('tr');
       const targetViewElement = pTr.querySelector('cc-document-actions').parentNode;
       const docID = p.getAttribute('id');
-      const link = p.querySelector('.external-application-links');
+      const link = p.parentNode.querySelector('.fa-external-link-square');
 
       targetViewElement.style.display = 'flex';
       targetViewElement.style.alignItems = 'center';
@@ -130,79 +136,103 @@ function createFasterLawIcon(docID, link) {
   const actionsContainer = document.createElement('div');
   actionsContainer.classList.add('fasterlaw-actions-container');
 
-  const openWithClioAction = document.createElement('div');
-  openWithClioAction.classList.add('action');
-  openWithClioAction.setAttribute(
-    'title',
-    'Open this document with Clio Launcher'
-  );
-  openWithClioAction.innerHTML = 'Open with Clio';
-  openWithClioAction.addEventListener('click', function () {
-    link.click();
-  });
+  const actionsTitle = document.createElement('div');
+  actionsTitle.classList.add('fasterlaw-actions-title', 'action');
+  actionsTitle.innerHTML = '<div class="title-icon"></div> Faster Suite';
 
-  const downloadAction = document.createElement('div');
-  downloadAction.classList.add('action');
-  downloadAction.setAttribute('title', 'Download this document');
-  downloadAction.innerHTML = 'Download';
-  downloadAction.addEventListener('click', function () {
-    window.open(`https://app.clio.com/iris/documents/${docID}/download`);
-  });
-
+  /**
+   * COMPARE ACTION
+   */
   const compareAction = document.createElement('div');
   compareAction.classList.add('action');
   compareAction.setAttribute(
     'title',
     'Compare this document using Faster Suite'
   );
-  compareAction.innerHTML = 'Compare this document';
+  compareAction.innerHTML = 'Compare';
   compareAction.addEventListener('click', function () {
     window.location = `alphadrive://localhost/Remoting/custom_actions/documents/compare?subject_url=/api/v4/documents/${docID}`;
   });
 
+  /**
+   * COPY LINK WITH FS ACTION
+   */
   const copyLinkAction = document.createElement('div');
   copyLinkAction.classList.add('action');
   copyLinkAction.setAttribute(
     'title',
     'Copy a link to this document using Faster Suite'
   );
-  copyLinkAction.innerHTML = 'Copy a link';
+  copyLinkAction.innerHTML = 'Copy Link';
   copyLinkAction.addEventListener('click', function () {
     window.location = `alphadrive://localhost/Remoting/custom_actions/documents/share/link?subject_url=/api/v4/documents/${docID}`;
   });
 
-  const openFolderAction = document.createElement('div');
-  openFolderAction.classList.add('action');
-  openFolderAction.setAttribute(
-    'title',
-    `Open this document's folder using Faster Suite`
-  );
-  openFolderAction.innerHTML = `Open folder`;
-  openFolderAction.addEventListener('click', function () {
-    window.location = `alphadrive://localhost/Remoting/custom_actions/documents/locate?subject_url=/api/v4/documents/${docID}`;
-  });
-
+  /**
+   * EDIT DOCUMENT ACTION
+   */
   const openWithFasterLawAction = document.createElement('div');
   openWithFasterLawAction.classList.add('action');
   openWithFasterLawAction.setAttribute(
     'title',
     `Open this document with Faster Suite`
   );
-  openWithFasterLawAction.innerHTML = 'Open document';
+  openWithFasterLawAction.innerHTML = 'Edit Document';
   openWithFasterLawAction.addEventListener('click', function () {
     window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
   });
 
-  actionsContainer.appendChild(openWithFasterLawAction);
-  actionsContainer.appendChild(openFolderAction);
-  actionsContainer.appendChild(copyLinkAction);
-  actionsContainer.appendChild(compareAction);
-  actionsContainer.appendChild(downloadAction);
-  actionsContainer.appendChild(openWithClioAction);
+  const openWithClioAction = document.createElement('div');
+  openWithClioAction.classList.add('action');
+  openWithClioAction.setAttribute(
+    'title',
+    'Open this document with Clio Launcher'
+  );
+  openWithClioAction.innerHTML = 'Open With Clio';
+  openWithClioAction.addEventListener('click', function () {
+    link.click();
+  });
 
+  /**
+   * DOWNLOAD ACTION
+   */
+  const downloadAction = document.createElement('div');
+  downloadAction.classList.add('action');
+  downloadAction.setAttribute('title', 'Download this document');
+  downloadAction.innerHTML = 'Download';
+  downloadAction.addEventListener('click', function () {
+    window.open(`https://app.clio.com/iris/documents/${docID}/download`);
+  });   
+
+  /**
+   * LOCATE ACTION
+   */
+  const openFolderAction = document.createElement('div');
+  openFolderAction.classList.add('action');
+  openFolderAction.setAttribute(
+    'title',
+    `Open this document's folder using Faster Suite`
+  );
+  openFolderAction.innerHTML = `Locate`;
+  openFolderAction.addEventListener('click', function () {
+    window.location = `alphadrive://localhost/Remoting/custom_actions/documents/locate?subject_url=/api/v4/documents/${docID}`;
+  });  
+
+  actionsContainer.appendChild(actionsTitle);
+  actionsContainer.appendChild(compareAction);
+  actionsContainer.appendChild(copyLinkAction);
+  actionsContainer.appendChild(openWithFasterLawAction);    
+  actionsContainer.appendChild(openFolderAction);
+  actionsContainer.appendChild(downloadAction);  
+  actionsContainer.appendChild(openWithClioAction);  
   fasterLawIcon.appendChild(actionsContainer);
 
   fasterLawIcon.addEventListener('click', function () {
+    document.querySelectorAll('.fasterlaw-actions-container').forEach(container => {
+      if(container !== actionsContainer){
+        container.classList.remove('open')
+      }
+    });
     actionsContainer.classList.toggle('open');
   });
 

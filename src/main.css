@@ -49,7 +49,31 @@
   cursor: pointer;  
 }
 
-.fasterlaw-icon:before {  
+.fasterlaw-actions-container .title-icon {   
+  displaY: inline-block;
+  margin-right: 8px;
+  background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/icon-0016.png");
+  width: 16px;
+  height: 16px;
+  background-size: contain;
+  background-repeat: no-repeat;  
+}
+
+.fasterlaw-actions-container .fasterlaw-actions-title.action {   
+  display: flex;
+  align-items: center;
+  cursor: default;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.fasterlaw-actions-container .fasterlaw-actions-title.action:hover {   
+  color: #000000;
+  background-color:  #ffffff;
+}
+
+
+.fasterlaw-icon.new-ui:before {  
   content: '';
   position: absolute;
   top: -3px;
@@ -65,8 +89,9 @@
   top: 18px;
   left: 0;    
   display: flex;
+  min-width: 180px;
   flex-direction: column;
-  width: 180px;
+  width: auto;
   height: auto;
   opacity: 0;  
   color: #000000;
@@ -85,7 +110,7 @@
 
 .fasterlaw-actions-container .action {
   flex: 0 0 auto;
-  padding: 5px 10px;  
+  padding: 5px 20px;
   transition: background-color 0.25s ease-in-out, color 0.25s ease-in-out;
 }
 
