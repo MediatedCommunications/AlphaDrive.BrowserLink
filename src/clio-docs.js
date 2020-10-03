@@ -188,7 +188,7 @@ function createFasterLawIcon(docID, link) {
     'title',
     'Open this document with Clio Launcher'
   );
-  openWithClioAction.innerHTML = 'Open With Clio';
+  openWithClioAction.innerHTML = 'Open With Clio Launcher';
   openWithClioAction.addEventListener('click', function () {
     link.click();
   });
