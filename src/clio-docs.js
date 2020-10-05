@@ -24,10 +24,12 @@ window.addEventListener(
   false
 );
 
-window.addEventListener('click', (event) => {    
+window.addEventListener('click', (event) => {
   if (!event.target.classList.contains('fasterlaw-icon')) {
-    document.querySelectorAll('.fasterlaw-actions-container').forEach(container => container.classList.remove('open'));
-  }  
+    document
+      .querySelectorAll('.fasterlaw-actions-container')
+      .forEach((container) => container.classList.remove('open'));
+  }
 });
 
 const observerCallback = function (mutationsList, observer) {
@@ -74,7 +76,7 @@ const observerCallback = function (mutationsList, observer) {
     nodes.forEach((node) => {
       if (enhancedNodes.includes(node)) {
         return;
-      }
+      }      
 
       node.addEventListener('click', (event) => {
         let IsDisabled =
@@ -83,14 +85,47 @@ const observerCallback = function (mutationsList, observer) {
             .getAttribute('data-value') === 'true';
         if (!IsDisabled) {
           event.preventDefault();
+          event.stopPropagation();
           window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
         }
-      });
+      });      
 
       const p = node.parentNode;
+      const siblingNode = p.parentNode.querySelector('.launcher-icon');
+      
+      if (siblingNode) {
+        siblingNode.addEventListener('click', (event) => {          
+          let IsDisabled =
+            document
+              .querySelector('#momane_ifOpen')
+              .getAttribute('data-value') === 'true';              
+          if (!IsDisabled) {
+            event.preventDefault();
+            event.stopPropagation();
+            window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
+          }
+        });      
+        if (siblingNode.childNodes.length > 0) {
+          siblingNode.childNodes.forEach(siblingChild => {
+            siblingChild.addEventListener('click', (event) => {              
+              let IsDisabled =
+                document
+                  .querySelector('#momane_ifOpen')
+                  .getAttribute('data-value') === 'true';                  
+              if (!IsDisabled) {
+                event.preventDefault();
+                event.stopPropagation();
+                window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
+              }
+            });
+          });
+        }
+      }
+
       const pTd = node.closest('td');
       const pTr = pTd.closest('tr');
-      const targetViewElement = pTr.querySelector('cc-document-actions').parentNode;
+      const targetViewElement = pTr.querySelector('cc-document-actions')
+        .parentNode;
       const docID = p.getAttribute('id');
       const link = p.parentNode.querySelector('.fa-external-link-square');
 
@@ -136,40 +171,8 @@ function createFasterLawIcon(docID, link) {
   const actionsContainer = document.createElement('div');
   actionsContainer.classList.add('fasterlaw-actions-container');
 
-  const actionsTitle = document.createElement('div');
-  actionsTitle.classList.add('fasterlaw-actions-title', 'action');
-  actionsTitle.innerHTML = '<div class="title-icon"></div> Faster Suite';
-
   /**
-   * COMPARE ACTION
-   */
-  const compareAction = document.createElement('div');
-  compareAction.classList.add('action');
-  compareAction.setAttribute(
-    'title',
-    'Compare this document using Faster Suite'
-  );
-  compareAction.innerHTML = 'Compare';
-  compareAction.addEventListener('click', function () {
-    window.location = `alphadrive://localhost/Remoting/custom_actions/documents/compare?subject_url=/api/v4/documents/${docID}`;
-  });
-
-  /**
-   * COPY LINK WITH FS ACTION
-   */
-  const copyLinkAction = document.createElement('div');
-  copyLinkAction.classList.add('action');
-  copyLinkAction.setAttribute(
-    'title',
-    'Copy a link to this document using Faster Suite'
-  );
-  copyLinkAction.innerHTML = 'Copy Link';
-  copyLinkAction.addEventListener('click', function () {
-    window.location = `alphadrive://localhost/Remoting/custom_actions/documents/share/link?subject_url=/api/v4/documents/${docID}`;
-  });
-
-  /**
-   * EDIT DOCUMENT ACTION
+   * OPEN WITH FASTER SUITE ACTION
    */
   const openWithFasterLawAction = document.createElement('div');
   openWithFasterLawAction.classList.add('action');
@@ -177,18 +180,23 @@ function createFasterLawIcon(docID, link) {
     'title',
     `Open this document with Faster Suite`
   );
-  openWithFasterLawAction.innerHTML = 'Edit Document';
+  openWithFasterLawAction.innerHTML =
+    '<div class="action-icon faster-suite"></div> Open with Faster Suite';
   openWithFasterLawAction.addEventListener('click', function () {
     window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
   });
 
+  /**
+   * OPEN WITH CLIO ACTION
+   */
   const openWithClioAction = document.createElement('div');
   openWithClioAction.classList.add('action');
   openWithClioAction.setAttribute(
     'title',
     'Open this document with Clio Launcher'
   );
-  openWithClioAction.innerHTML = 'Open With Clio Launcher';
+  openWithClioAction.innerHTML =
+    '<div class="action-icon clio"></div> Open with Clio Launcher';
   openWithClioAction.addEventListener('click', function () {
     link.click();
   });
@@ -197,42 +205,73 @@ function createFasterLawIcon(docID, link) {
    * DOWNLOAD ACTION
    */
   const downloadAction = document.createElement('div');
-  downloadAction.classList.add('action');
+  downloadAction.classList.add('action', 'separator');
   downloadAction.setAttribute('title', 'Download this document');
-  downloadAction.innerHTML = 'Download';
+  downloadAction.innerHTML =
+    '<div class="action-icon download"></div> Download';
   downloadAction.addEventListener('click', function () {
     window.open(`https://app.clio.com/iris/documents/${docID}/download`);
-  });   
+  });
 
   /**
    * LOCATE ACTION
    */
-  const openFolderAction = document.createElement('div');
-  openFolderAction.classList.add('action');
-  openFolderAction.setAttribute(
+  const LocateAction = document.createElement('div');
+  LocateAction.classList.add('action');
+  LocateAction.setAttribute(
     'title',
     `Open this document's folder using Faster Suite`
   );
-  openFolderAction.innerHTML = `Locate`;
-  openFolderAction.addEventListener('click', function () {
+  LocateAction.innerHTML = `<div class="action-icon locate"></div> Locate`;
+  LocateAction.addEventListener('click', function () {
     window.location = `alphadrive://localhost/Remoting/custom_actions/documents/locate?subject_url=/api/v4/documents/${docID}`;
-  });  
+  });
 
-  actionsContainer.appendChild(actionsTitle);
-  actionsContainer.appendChild(compareAction);
+   /**
+   * COPY LINK WITH FASTER SUITE ACTION
+   */
+  const copyLinkAction = document.createElement('div');
+  copyLinkAction.classList.add('action', 'separator');
+  copyLinkAction.setAttribute(
+    'title',
+    'Copy a link to this document using Faster Suite'
+  );
+  copyLinkAction.innerHTML = '<div class="action-icon link"></div> Copy Link';
+  copyLinkAction.addEventListener('click', function () {
+    window.location = `alphadrive://localhost/Remoting/custom_actions/documents/share/link?subject_url=/api/v4/documents/${docID}`;
+  });
+
+  /**
+   * COMPARE/HISTORY ACTION
+   */
+  const compareAction = document.createElement('div');
+  compareAction.classList.add('action');
+  compareAction.setAttribute(
+    'title',
+    'Compare this document using Faster Suite'
+  );
+  compareAction.innerHTML = '<div class="action-icon compare"></div> Compare / History';
+  compareAction.addEventListener('click', function () {
+    window.location = `alphadrive://localhost/Remoting/custom_actions/documents/compare?subject_url=/api/v4/documents/${docID}`;
+  });
+  
+  actionsContainer.appendChild(openWithFasterLawAction);
+  actionsContainer.appendChild(openWithClioAction);
+  actionsContainer.appendChild(downloadAction);
+  actionsContainer.appendChild(LocateAction);
   actionsContainer.appendChild(copyLinkAction);
-  actionsContainer.appendChild(openWithFasterLawAction);    
-  actionsContainer.appendChild(openFolderAction);
-  actionsContainer.appendChild(downloadAction);  
-  actionsContainer.appendChild(openWithClioAction);  
+  actionsContainer.appendChild(compareAction);  
+  
   fasterLawIcon.appendChild(actionsContainer);
 
   fasterLawIcon.addEventListener('click', function () {
-    document.querySelectorAll('.fasterlaw-actions-container').forEach(container => {
-      if(container !== actionsContainer){
-        container.classList.remove('open')
-      }
-    });
+    document
+      .querySelectorAll('.fasterlaw-actions-container')
+      .forEach((container) => {
+        if (container !== actionsContainer) {
+          container.classList.remove('open');
+        }
+      });
     actionsContainer.classList.toggle('open');
   });
 
