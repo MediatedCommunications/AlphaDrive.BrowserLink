@@ -32,6 +32,12 @@ window.addEventListener('click', (event) => {
   }
 });
 
+window.addEventListener('wheel', (event) => {
+  document
+      .querySelectorAll('.fasterlaw-actions-container')
+      .forEach((container) => container.classList.remove('open'));
+});
+
 const observerCallback = function (mutationsList, observer) {
   if (observer) {
     observer.disconnect();
@@ -65,7 +71,7 @@ const observerCallback = function (mutationsList, observer) {
       const link = p.querySelector('.external-application-links');
 
       if (!p.querySelector('.momane_out')) {
-        let fasterLawIcon = createFasterLawIcon(docID, link);
+        let fasterLawIcon = createFasterLawIcon(docID, link, false);
         p.prepend(fasterLawIcon);
       }
       scope.itemClicked = newDownloadItem(scope.itemClicked);
@@ -135,7 +141,7 @@ const observerCallback = function (mutationsList, observer) {
       targetViewElement.style.position = 'relative';
 
       if (!p.querySelector('.momane_out')) {
-        let fasterLawIcon = createFasterLawIcon(docID, link);
+        let fasterLawIcon = createFasterLawIcon(docID, link, true);
         fasterLawIcon.classList.add('new-ui');
         targetViewElement.append(fasterLawIcon);
       }
@@ -164,12 +170,12 @@ function initialize() {
   }
 }
 
-function createFasterLawIcon(docID, link) {
+function createFasterLawIcon(docID, link, isNewUi) {
   const fasterLawIcon = document.createElement('div');
   fasterLawIcon.classList.add('fasterlaw-icon');
 
   const actionsContainer = document.createElement('div');
-  actionsContainer.classList.add('fasterlaw-actions-container');
+  actionsContainer.classList.add('fasterlaw-actions-container', 'new-ui');
 
   /**
    * OPEN WITH FASTER SUITE ACTION
@@ -278,8 +284,9 @@ function createFasterLawIcon(docID, link) {
     actionsContainer.classList.toggle('open');
     const rect = fasterLawIcon.getBoundingClientRect();
     const win = fasterLawIcon.ownerDocument.defaultView;
+    const extendUp = win.innerHeight - rect.top < 300;    
     
-    actionsContainer.style.top = rect.top + win.pageYOffset + 18 + 'px';
+    actionsContainer.style.top = extendUp ? rect.top + win.pageYOffset - 200 + 'px' : rect.top + win.pageYOffset + 20 + 'px';
     actionsContainer.style.left = rect.left + win.pageXOffset + 'px';
   });
 
