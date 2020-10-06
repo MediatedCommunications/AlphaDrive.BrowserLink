@@ -39,6 +39,7 @@
 }
 
 .fasterlaw-icon.new-ui {  
+  position: inherit;
   flex: 0 0 auto;
   margin: 0 0 0 5px;
   background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/icon-0128.png");

@@ -262,7 +262,10 @@ function createFasterLawIcon(docID, link) {
   actionsContainer.appendChild(copyLinkAction);
   actionsContainer.appendChild(compareAction);  
   
-  fasterLawIcon.appendChild(actionsContainer);
+  const body = document.body;
+
+  // fasterLawIcon.appendChild(actionsContainer);
+  body.appendChild(actionsContainer);
 
   fasterLawIcon.addEventListener('click', function () {
     document
@@ -273,6 +276,11 @@ function createFasterLawIcon(docID, link) {
         }
       });
     actionsContainer.classList.toggle('open');
+    const rect = fasterLawIcon.getBoundingClientRect();
+    const win = fasterLawIcon.ownerDocument.defaultView;
+    
+    actionsContainer.style.top = rect.top + win.pageYOffset + 18 + 'px';
+    actionsContainer.style.left = rect.left + win.pageXOffset + 'px';
   });
 
   return fasterLawIcon;
