@@ -2,19 +2,20 @@ function getTabById(tabId, cb) {
   chrome.tabs.get(tabId, cb);
 }
 
-function updateToolbarButton(tab) {
+function updateToolbarButton(tab) {  
   // Updates the toolbar button for a tab to reflect the tab's login status.
   let setTitleIcon = function(title, icon) {
     chrome.browserAction.setTitle({ title: "Faster Law: " + title });
     chrome.browserAction.setIcon({ path: icon });
   };
 
-  chrome.storage.local.get("options", function(items) {
+  chrome.storage.local.get("options", function(items) {  
+    
     if (tab === null || tab === undefined) {
       // There's code in Firefox that can be called before the defaults are set
       // and before the tab is even established. Catch that, and handle it or
       // else it can crash things.
-      setTitleIcon("Faster Law is ready", {
+      setTitleIcon("Faster Suite Browser Link", {
         "19": "assets/images/icon-0128.png",
         "38": "assets/images/icon-0128.png"
       });
@@ -28,7 +29,7 @@ function updateToolbarButton(tab) {
     }
 
     if (items && items["options"] && items["options"]["recap_disabled"]) {
-      setTitleIcon("Faster Law is temporarily disabled", {
+      setTitleIcon("Faster Suite Browser Link", {
         "19": "assets/images/icon-0128.png",
         "38": "assets/images/icon-0128.png"
       });

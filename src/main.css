@@ -25,3 +25,176 @@
   background-size: contain;
   background-repeat: no-repeat;
 }
+
+.fasterlaw-icon {
+  position: relative;
+  display: inline-block;
+  background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/icon-0128.png");
+  width: 18px;
+  height: 18px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  cursor: pointer;  
+  margin-right: 1em;
+}
+
+.fasterlaw-icon.new-ui {  
+  position: inherit;
+  flex: 0 0 auto;
+  margin: 0 0 0 5px;
+  background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/icon-0128.png");
+  width: 18px;
+  height: 18px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  cursor: pointer;  
+}
+
+.fasterlaw-actions-container .title-icon {   
+  displaY: inline-block;
+  margin-right: 8px;
+  background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/icon-0016.png");
+  width: 16px;
+  height: 16px;
+  background-size: contain;
+  background-repeat: no-repeat;  
+}
+
+.fasterlaw-actions-container .fasterlaw-actions-title.action {   
+  display: flex;
+  align-items: center;
+  cursor: default;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.fasterlaw-actions-container .fasterlaw-actions-title.action:hover {   
+  color: #000000;
+  background-color:  #ffffff;
+}
+
+.fasterlaw-icon.new-ui:before {  
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -6px;
+  border: 1px solid #b0bec5;
+  border-radius: 0 3px 3px 0;
+  width: 28px;
+  height: 22px;
+}
+
+.fasterlaw-actions-container {
+  position: absolute;  
+  top: 18px;
+  left: 0;    
+  display: flex;
+  min-width: 180px;
+  flex-direction: column;
+  width: auto;
+  height: auto;
+  opacity: 0;  
+  color: #000000;
+  background-color: #ffffff;  
+  transition: opacity 0.25s ease-out;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.fasterlaw-actions-container.open { 
+  opacity: 1;  
+  border: 1px solid rgb(42, 87, 154);
+  z-index: 1001;
+  pointer-events: all;
+}
+
+.fasterlaw-actions-container .action {
+  flex: 0 0 auto;
+  padding: 5px 20px;
+  transition: background-color 0.25s ease-in-out, color 0.25s ease-in-out;
+}
+
+.fasterlaw-actions-container .action:hover {
+  color: #ffffff;
+  background-color:  rgb(42, 87, 154);
+}
+
+.fasterlaw-actions-container.new-ui {
+  position: absolute;  
+  top: 18px;
+  left: 0;    
+  display: flex;
+  min-width: 180px;
+  flex-direction: column;
+  width: auto;
+  height: auto;
+  opacity: 0;  
+  color: #000000;
+  background-color: #ffffff;  
+  transition: opacity 0.25s ease-out;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.fasterlaw-actions-container.new-ui.open {
+  opacity: 1;  
+  border: 1px solid #ccd9e0;
+  z-index: 1001;
+  pointer-events: all;
+  border-radius: .25rem;
+}
+
+.fasterlaw-actions-container.new-ui .action {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;  
+  line-height: 32px;
+  color: #001c37;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.fasterlaw-actions-container.new-ui .action.separator {
+  border-bottom: 1px solid #ccd9e0;
+}
+
+.fasterlaw-actions-container.new-ui .action:hover {  
+  color:#001c37;
+  background: #eceff1;
+}
+
+.fasterlaw-actions-container .action-icon {
+  display: inline-block;
+  margin-right: 8px;  
+  width: 16px;
+  height: 16px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: 0.6;
+}
+
+.fasterlaw-actions-container .action-icon.faster-suite {   
+  opacity: 1;
+  background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/icon-0016.png");
+}
+
+.fasterlaw-actions-container .action-icon.clio {   
+  background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/external-link-square-solid.svg");
+}
+
+.fasterlaw-actions-container .action-icon.download {   
+  background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/download-solid.svg");
+}
+
+.fasterlaw-actions-container .action-icon.locate {   
+  background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/folder-open-solid.svg");
+}
+
+.fasterlaw-actions-container .action-icon.link {   
+  background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/link-solid.svg");
+}
+
+.fasterlaw-actions-container .action-icon.compare {   
+  background-image: url("chrome-extension://__MSG_@@extension_id__/assets/images/adjust-solid.svg");
+}
