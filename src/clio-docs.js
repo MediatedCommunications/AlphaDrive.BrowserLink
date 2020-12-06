@@ -34,8 +34,8 @@ window.addEventListener('click', (event) => {
 
 window.addEventListener('wheel', (event) => {
   document
-      .querySelectorAll('.fasterlaw-actions-container')
-      .forEach((container) => container.classList.remove('open'));
+    .querySelectorAll('.fasterlaw-actions-container')
+    .forEach((container) => container.classList.remove('open'));
 });
 
 const observerCallback = function (mutationsList, observer) {
@@ -44,6 +44,7 @@ const observerCallback = function (mutationsList, observer) {
   }
 
   let isNewUI = false;
+  let isSearchResult = false;
 
   const ifRewrite =
     document.querySelector('#momane_enhance').getAttribute('data-value') ===
@@ -52,14 +53,29 @@ const observerCallback = function (mutationsList, observer) {
     return;
   }
 
+  // Checks old UI selector
   let nodes = document.querySelectorAll("a[e-form='documentNameForm']");
 
+  // Checks new UI selector
   if (nodes.length < 1) {
     nodes = document.querySelectorAll('tr a[href*="/download"]');
-    isNewUI = true;
+
+    if (nodes.length > 0) {
+      isNewUI = true;
+    }
   }
 
-  if (nodes.length > 0 && !isNewUI) {
+  // Checks new UI search results selector
+  if (nodes.length < 1 && !isNewUI) {
+    nodes = document.querySelectorAll('tr a[href*="/details"]');
+
+    if (nodes.length > 0) {
+      isSearchResult = true;
+    }
+  }
+
+  // Parse old UI
+  if (nodes.length > 0 && !isNewUI && !isSearchResult) {
     nodes.forEach((node) => {
       if (enhancedNodes.includes(node)) {
         return;
@@ -78,56 +94,15 @@ const observerCallback = function (mutationsList, observer) {
     });
   }
 
+  // Parse new UI
   if (nodes.length > 0 && isNewUI) {
     nodes.forEach((node) => {
       if (enhancedNodes.includes(node)) {
         return;
-      }      
-
-      node.addEventListener('click', (event) => {
-        let IsDisabled =
-          document
-            .querySelector('#momane_ifOpen')
-            .getAttribute('data-value') === 'true';
-        if (!IsDisabled) {
-          event.preventDefault();
-          event.stopPropagation();
-          window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
-        }
-      });      
+      }
 
       const p = node.parentNode;
       const siblingNode = p.parentNode.querySelector('.launcher-icon');
-      
-      if (siblingNode) {
-        siblingNode.addEventListener('click', (event) => {          
-          let IsDisabled =
-            document
-              .querySelector('#momane_ifOpen')
-              .getAttribute('data-value') === 'true';              
-          if (!IsDisabled) {
-            event.preventDefault();
-            event.stopPropagation();
-            window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
-          }
-        });      
-        if (siblingNode.childNodes.length > 0) {
-          siblingNode.childNodes.forEach(siblingChild => {
-            siblingChild.addEventListener('click', (event) => {              
-              let IsDisabled =
-                document
-                  .querySelector('#momane_ifOpen')
-                  .getAttribute('data-value') === 'true';                  
-              if (!IsDisabled) {
-                event.preventDefault();
-                event.stopPropagation();
-                window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
-              }
-            });
-          });
-        }
-      }
-
       const pTd = node.closest('td');
       const pTr = pTd.closest('tr');
       const targetViewElement = pTr.querySelector('cc-document-actions')
@@ -145,6 +120,86 @@ const observerCallback = function (mutationsList, observer) {
         fasterLawIcon.classList.add('new-ui');
         targetViewElement.append(fasterLawIcon);
       }
+
+      node.addEventListener('click', (event) => {
+        let IsDisabled =
+          document
+            .querySelector('#momane_ifOpen')
+            .getAttribute('data-value') === 'true';
+        if (!IsDisabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
+        }
+      });
+
+      if (siblingNode) {
+        siblingNode.addEventListener('click', (event) => {
+          let IsDisabled =
+            document
+              .querySelector('#momane_ifOpen')
+              .getAttribute('data-value') === 'true';
+          if (!IsDisabled) {
+            event.preventDefault();
+            event.stopPropagation();
+            window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
+          }
+        });
+        if (siblingNode.childNodes.length > 0) {
+          siblingNode.childNodes.forEach((siblingChild) => {
+            siblingChild.addEventListener('click', (event) => {
+              let IsDisabled =
+                document
+                  .querySelector('#momane_ifOpen')
+                  .getAttribute('data-value') === 'true';
+              if (!IsDisabled) {
+                event.preventDefault();
+                event.stopPropagation();
+                window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
+              }
+            });
+          });
+        }
+      }
+    });
+  }
+
+  // Parse new ui search results
+  if (nodes.length > 0 && isSearchResult) {    
+
+    nodes.forEach((node) => {      
+      const isAlreadyEnhanced = enhancedNodes.includes(node);
+
+      if (isAlreadyEnhanced) {
+        return;
+      }
+
+      console.log(node);
+
+      const parentNode = node.parentNode;
+      const docIdRegEx = /{\s?id:\s?(\d+)\s?}/gm;
+      const docIdAttr = node.getAttribute('ui-sref');
+      const docIdMatch = docIdRegEx.exec(docIdAttr);
+      const docId = docIdMatch[1];
+      const fasterLawIcon = createFasterLawIcon(docId, node, true);
+      
+      node.addEventListener('mousedown', (event) => {
+        let IsDisabled =
+          document
+            .querySelector('#momane_ifOpen')
+            .getAttribute('data-value') === 'true';
+        if (!IsDisabled) {
+          event.preventDefault();
+          event.stopPropagation();
+          window.location = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docId}`;
+        }
+      });
+
+      parentNode.style.display = 'flex';
+      parentNode.style.alignItems = 'center';
+      fasterLawIcon.style.margin = 0;
+      fasterLawIcon.style.marginLeft = '8px';
+      parentNode.append(fasterLawIcon);
     });
   }
 
@@ -233,7 +288,7 @@ function createFasterLawIcon(docID, link, isNewUi) {
     window.location = `alphadrive://localhost/Remoting/custom_actions/documents/locate?subject_url=/api/v4/documents/${docID}`;
   });
 
-   /**
+  /**
    * COPY LINK WITH FASTER SUITE ACTION
    */
   const copyLinkAction = document.createElement('div');
@@ -256,18 +311,19 @@ function createFasterLawIcon(docID, link, isNewUi) {
     'title',
     'Compare this document using Faster Suite'
   );
-  compareAction.innerHTML = '<div class="action-icon compare"></div> Compare / History';
+  compareAction.innerHTML =
+    '<div class="action-icon compare"></div> Compare / History';
   compareAction.addEventListener('click', function () {
     window.location = `alphadrive://localhost/Remoting/custom_actions/documents/compare?subject_url=/api/v4/documents/${docID}`;
   });
-  
+
   actionsContainer.appendChild(openWithFasterLawAction);
   actionsContainer.appendChild(openWithClioAction);
   actionsContainer.appendChild(downloadAction);
   actionsContainer.appendChild(LocateAction);
   actionsContainer.appendChild(copyLinkAction);
-  actionsContainer.appendChild(compareAction);  
-  
+  actionsContainer.appendChild(compareAction);
+
   const body = document.body;
 
   // fasterLawIcon.appendChild(actionsContainer);
@@ -284,9 +340,11 @@ function createFasterLawIcon(docID, link, isNewUi) {
     actionsContainer.classList.toggle('open');
     const rect = fasterLawIcon.getBoundingClientRect();
     const win = fasterLawIcon.ownerDocument.defaultView;
-    const extendUp = win.innerHeight - rect.top < 300;    
-    
-    actionsContainer.style.top = extendUp ? rect.top + win.pageYOffset - 200 + 'px' : rect.top + win.pageYOffset + 20 + 'px';
+    const extendUp = win.innerHeight - rect.top < 300;
+
+    actionsContainer.style.top = extendUp
+      ? rect.top + win.pageYOffset - 200 + 'px'
+      : rect.top + win.pageYOffset + 20 + 'px';
     actionsContainer.style.left = rect.left + win.pageXOffset + 'px';
   });
 

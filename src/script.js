@@ -57,9 +57,9 @@ function rewritePage() {
   Tries += 1;
 
   let nodes = document.querySelectorAll('a[href*="/download"]');
-  // let nodes = document.querySelectorAll("a[e-form='documentNameForm']");
-  console.log(nodes);
-  console.log(getDocID(nodes[0]));
+  
+  // console.log(nodes);
+  // console.log(getDocID(nodes[0]));
   
   if (nodes) {
     nodes.forEach(node => {
