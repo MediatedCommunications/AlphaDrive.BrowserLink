@@ -1,19 +1,37 @@
 {
+  "manifest_version": 3,
   "name": "Faster Suite Browser Link",
   "short_name": "AD4Chrome",
-  "description": "Open documents straight from Clio, get free PACER looks, and much, much more.\n",
-  "version": "20.12.6.1834",
-  "manifest_version": 2,
+  "description": "Open documents straight from Clio, get free PACER looks, and much, much more.",
+  "version": "25.01.05.1926",
+  "permissions": [
+    "storage",
+    "notifications",
+    "*://*.uscourts.gov/",
+    "tabs",
+    "cookies",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "*://app.clio.com/*",
+    "*://au.app.clio.com/*",
+    "*://eu.app.clio.com/*"
+  ],
   "background": {
-    "scripts": [
-      "assets/js/jquery-3.2.1.js",
-      "utils.js",
-      "notifier.js",
-      "toolbar_button.js",
-      "pacer.js",
-      "recap.js",
-      "background.js"
-    ]
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon-0016.png",
+      "48": "icon-0048.png",
+      "128": "icon-0128.png"
+    }
+  },
+  "icons": {
+    "16": "icon-0016.png",
+    "48": "icon-0048.png",
+    "128": "icon-0128.png"
   },
   "content_scripts": [
     {
@@ -29,7 +47,6 @@
       "css": [
         "main.css"
       ],
-      "run_at": "document_start",
       "all_frames": true
     },
     {
@@ -71,24 +88,18 @@
     }
   ],
   "web_accessible_resources": [
-    "script.js",
-    "clio-docs.js",
-    "assets/*"
-  ],
-  "icons": {
-    "64": "icon-0128.png"
-  },
-  "browser_action": {
-    "default_icon": "icon-0128.png",
-    "default_popup": "popup.html",
-    "default_title": "Faster Suite Browser Link"
-  },
-  "permissions": [
-    "storage",
-    "notifications",
-    "*://*.uscourts.gov/",
-    "tabs",
-    "cookies"
+    {
+      "resources": [
+        "clio-docs.js",
+        "assets/*"
+      ],
+      "matches": [
+        "https://app.clio.com/*",
+        "https://app.goclio.eu/*",
+        "https://*.app.clio.com/*",
+        "https://*.app.goclio.eu/*"
+      ]
+    }
   ],
   "author": "Hank X  yrstyh@gmail.com"
 }
