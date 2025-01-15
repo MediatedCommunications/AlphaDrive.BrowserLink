@@ -10,11 +10,12 @@ import { checkAnySelector } from '@/lib/utils';
 import { UiVersion } from '@/types/clio';
 import './clio.css';
 
-const observerConfig = { attributes: false, childList: true, subtree: true };
 const documentLinkManager = new DocumentLinkManager();
 const toastManager = new ToastManager();
+const observerConfig = { attributes: false, childList: true, subtree: true };
 const observer = new MutationObserver(observerCallback);
 
+// Observing for changes in the DOM
 observer.observe(document.body, observerConfig);
 
 async function observerCallback(

@@ -129,6 +129,7 @@
   flex: 0 0 auto;
   padding: 5px 20px;
   transition: background-color 0.25s ease-in-out, color 0.25s ease-in-out;
+  :-1 ;
 }
 
 .fasterlaw-actions-container .action:hover {

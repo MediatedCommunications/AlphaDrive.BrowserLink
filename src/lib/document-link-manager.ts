@@ -20,20 +20,16 @@ export class DocumentLinkManager {
       }
     });
 
-    console.log('Total Enhanced Nodes', this.enhancedNodes);
+    this.clickOutsideEventBinding();
   }
 
   private getDocumentLinks(uiVersion: UiVersion): DocumentLink[] {
     let nodes: NodeListOf<HTMLElement>;
 
-    console.log('uiVersion', uiVersion);
-
     if (uiVersion === UiVersion.New) {
       nodes = document.querySelectorAll(
         `${NEW_UI_SELECTOR_DOWNLOADS}, ${NEW_UI_SELECTOR_DETAILS}`
       );
-
-      console.log('new version nodes', nodes);
 
       return this.extractDocumentLinks(nodes, uiVersion);
     } else if (uiVersion === UiVersion.Old) {
@@ -66,6 +62,20 @@ export class DocumentLinkManager {
     });
 
     return documentLinks;
+  }
+
+  private clickOutsideEventBinding(): void {
+    document.addEventListener('click', (event) => {
+      if (
+        !(event.target as HTMLElement).closest(
+          '.fasterlaw-actions-container, .fasterlaw-icon'
+        )
+      ) {
+        document
+          .querySelectorAll('.fasterlaw-actions-container')
+          .forEach((container) => container.classList.remove('open'));
+      }
+    });
   }
 
   private addActionsToEnhancedLink(

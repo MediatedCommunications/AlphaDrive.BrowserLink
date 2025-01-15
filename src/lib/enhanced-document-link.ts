@@ -45,13 +45,18 @@ export class EnhancedDocumentLink {
     actionElement.classList.add('action');
     actionElement.setAttribute('title', action.title);
     actionElement.innerHTML = `<div class="action-icon ${action.iconClass}"></div> ${action.text}`;
-    actionElement.addEventListener('click', action.onClick);
+
+    actionElement.addEventListener('click', () => {
+      action.onClick();
+      this.toggleActionsContainer();
+    });
+
     return actionElement;
   }
 
   private attachIcon(): void {
     const parentNode = this.node.parentNode as HTMLElement;
-    const siblingNode = parentNode.querySelector('.launcher-icon');
+    // const siblingNode = parentNode.querySelector('.launcher-icon');
 
     // New UI specific logic
     if (this.uiVersion === UiVersion.New) {
@@ -90,6 +95,7 @@ export class EnhancedDocumentLink {
   }
 
   private toggleActionsContainer(): void {
+    console.log('toggleActionsContainer');
     document
       .querySelectorAll('.fasterlaw-actions-container')
       .forEach((container) => {
@@ -108,12 +114,12 @@ export class EnhancedDocumentLink {
     this.actionsContainer.style.top = extendUp
       ? `${rect.top + win.scrollY - 200}px`
       : `${rect.top + win.scrollY + 20}px`;
-    this.actionsContainer.style.left = `${rect.left + win.scrollX}px`; // Also using scrollX for consistency
+    this.actionsContainer.style.left = `${rect.left + win.scrollX}px`;
   }
 
   private async isExtensionDisabled(): Promise<boolean> {
     const setting = await getSetting('clio_open_docs');
-    return setting ? true : false;
+    return setting ? false : true;
   }
 
   public addActions(actions: Action[]): void {
