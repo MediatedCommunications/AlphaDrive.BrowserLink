@@ -1,3 +1,4 @@
+import { updateAppIcon } from '@/lib/utils';
 import React, { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -44,8 +45,10 @@ const Popup: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const subscription = form.watch((data) => {
-      saveSettings(data);
+    const subscription = form.watch(async (data) => {
+      await saveSettings(data);
+
+      updateAppIcon();
     });
     return () => subscription.unsubscribe();
   }, [form]);

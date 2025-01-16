@@ -1,6 +1,8 @@
 export interface Action {
+  name: string;
   title: string;
   iconClass: string;
+  iconUrl: string;
   text: string;
   onClick: () => void;
 }

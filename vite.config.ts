@@ -35,15 +35,13 @@ const manifest = defineManifest({
   ],
   web_accessible_resources: [
     {
-      matches: [
-        'https://app.clio.com/*',
-        'https://app.goclio.eu/*',
-        'https://*.app.clio.com/*',
-        'https://*.app.goclio.eu/*',
-      ],
       resources: ['assets/*'],
+      matches: [],
     },
   ],
+  icons: {
+    128: 'src/assets/images/icon-0128-disabled.png',
+  },
 });
 
 // https://vite.dev/config/

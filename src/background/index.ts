@@ -1,9 +1,8 @@
-import { getSettings, subscribeToSettingChange } from '@/lib/settings';
-import { getBrowserExtensionAPI } from '@/lib/utils';
-import { SettingsSchemaType } from '@/schemas/settings.schema';
+import { getSettings } from '@/lib/settings';
+import { updateAppIcon } from '@/lib/utils';
 
+// Initialize storage variables with default values if they don't exist
 chrome.runtime.onInstalled.addListener(async () => {
-  // Initialize storage variables with default values if they don't exist
   const settings = await getSettings();
 
   if (settings.clio_enhance_docs === undefined) {
@@ -23,99 +22,9 @@ chrome.runtime.onInstalled.addListener(async () => {
   }
 });
 
-async function updateAppIcon(
-  tab?: chrome.tabs.Tab,
-  newSettings?: SettingsSchemaType
-) {
-  const settings = { ...(await getSettings()), ...newSettings };
-  console.log('updating app icon', settings);
-
-  if (tab && tab.url) {
-    const url = new URL(tab.url);
-    const isClioPage =
-      url.hostname.endsWith('.app.clio.com') || url.hostname === 'app.clio.com';
-    const isPacerPage =
-      url.hostname.endsWith('.uscourts.gov') || url.hostname === 'uscourts.gov';
-
-    if ((settings.clio_enhance_docs || settings.clio_open_docs) && isClioPage) {
-      chrome.action.setIcon({
-        tabId: tab.id,
-        path: getBrowserExtensionAPI().runtime.getURL(
-          'src/assets/images/icon-0128.png'
-        ),
-      });
-      chrome.action.setTitle({
-        tabId: tab.id,
-        title: 'Faster Suite is active!',
-      });
-    } else if (
-      (settings.pacer_auto_save_and_archive ||
-        settings.pacer_notify_when_archived) &&
-      isPacerPage
-    ) {
-      chrome.action.setIcon({
-        tabId: tab.id,
-        path: getBrowserExtensionAPI().runtime.getURL(
-          'src/assets/images/icon-0128.png'
-        ),
-      });
-      chrome.action.setTitle({
-        tabId: tab.id,
-        title: 'Faster Suite is active!',
-      });
-    } else {
-      chrome.action.setIcon({
-        tabId: tab.id,
-        path: getBrowserExtensionAPI().runtime.getURL(
-          'src/assets/images/icon-0128-disabled.png'
-        ),
-      });
-      chrome.action.setTitle({
-        tabId: tab.id,
-        title: 'Faster Suite is inactive',
-      });
-    }
-  } else {
-    // If no tab information is available, fall back to setting-only based icon
-    if (settings.clio_enhance_docs || settings.clio_open_docs) {
-      chrome.action.setIcon({
-        path: getBrowserExtensionAPI().runtime.getURL(
-          'src/assets/images/icon-0128.png'
-        ),
-      });
-      chrome.action.setTitle({
-        title: 'Faster Suite is active!',
-      });
-    } else if (
-      settings.pacer_auto_save_and_archive ||
-      settings.pacer_notify_when_archived
-    ) {
-      chrome.action.setIcon({
-        path: getBrowserExtensionAPI().runtime.getURL(
-          'src/assets/images/icon-0128.png'
-        ),
-      });
-      chrome.action.setTitle({
-        title: 'Faster Suite is active!',
-      });
-    } else {
-      chrome.action.setIcon({
-        path: getBrowserExtensionAPI().runtime.getURL(
-          'src/assets/images/icon-0128-disabled.png'
-        ),
-      });
-      chrome.action.setTitle({
-        title: 'Faster Suite is inactive',
-      });
-    }
-  }
-}
-
 // Call updateAppIcon initially for the current tab
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-  if (tabs[0]) {
-    updateAppIcon(tabs[0]);
-  }
+  updateAppIcon(tabs[0]);
 });
 
 // Listen for tab changes to update the icon
@@ -125,17 +34,76 @@ chrome.tabs.onUpdated.addListener((_tabId, changeInfo, tab) => {
   }
 });
 
-// Listen for storage changes to update the icon
-subscribeToSettingChange(['clio_enhance_docs', 'clio_open_docs'], (changes) => {
-  if (Object.keys(changes).length > 0) {
-    const newSettings: Partial<SettingsSchemaType> = {};
-    for (const key in changes) {
-      newSettings[key as keyof SettingsSchemaType] = (
-        changes as Record<string, { newValue: boolean; oldValue: boolean }>
-      )[key].newValue;
-    }
+// // Listen for storage changes to update the icon
+// subscribeToSettingChange(
+//   ['clio_enhance_docs', 'clio_open_docs'],
+//   async (changes) => {
+//     if (Object.keys(changes).length > 0) {
+//       const newSettings: Partial<SettingsSchemaType> = {};
+//       for (const key in changes) {
+//         newSettings[key as keyof SettingsSchemaType] = (
+//           changes as Record<string, { newValue: boolean; oldValue: boolean }>
+//         )[key].newValue;
+//       }
 
-    // Call updateAppIcon with the newSettings
-    updateAppIcon(undefined, newSettings as SettingsSchemaType);
-  }
-});
+//       const tab = await getActiveTab();
+
+//       // Call updateAppIcon with the newSettings
+//       updateAppIcon(tab, newSettings as SettingsSchemaType);
+//     }
+//   }
+// );
+
+// async function updateAppIcon(
+//   tab?: chrome.tabs.Tab,
+//   newSettings?: SettingsSchemaType
+// ) {
+//   const settings = { ...(await getSettings()), ...newSettings };
+
+//   if (tab && tab.url) {
+//     const url = new URL(tab.url);
+//     const isClioPage =
+//       url.hostname.endsWith('.app.clio.com') || url.hostname === 'app.clio.com';
+//     const isPacerPage =
+//       url.hostname.endsWith('.uscourts.gov') || url.hostname === 'uscourts.gov';
+
+//     if ((settings.clio_enhance_docs || settings.clio_open_docs) && isClioPage) {
+//       chrome.action.setIcon({
+//         tabId: tab.id,
+//         path: getBrowserExtensionAPI().runtime.getURL(
+//           'src/assets/images/icon-0128.png'
+//         ),
+//       });
+//       chrome.action.setTitle({
+//         tabId: tab.id,
+//         title: 'Faster Suite is active!',
+//       });
+//     } else if (
+//       (settings.pacer_auto_save_and_archive ||
+//         settings.pacer_notify_when_archived) &&
+//       isPacerPage
+//     ) {
+//       chrome.action.setIcon({
+//         tabId: tab.id,
+//         path: getBrowserExtensionAPI().runtime.getURL(
+//           'src/assets/images/icon-0128.png'
+//         ),
+//       });
+//       chrome.action.setTitle({
+//         tabId: tab.id,
+//         title: 'Faster Suite is active!',
+//       });
+//     } else {
+//       chrome.action.setIcon({
+//         tabId: tab.id,
+//         path: getBrowserExtensionAPI().runtime.getURL(
+//           'src/assets/images/icon-0128-disabled.png'
+//         ),
+//       });
+//       chrome.action.setTitle({
+//         tabId: tab.id,
+//         title: 'Faster Suite is inactive',
+//       });
+//     }
+//   }
+// }

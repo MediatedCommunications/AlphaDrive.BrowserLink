@@ -26,7 +26,7 @@ export class EnhancedDocumentLink {
 
   private createFasterLawIcon(): HTMLDivElement {
     const fasterLawIcon = document.createElement('div');
-    fasterLawIcon.classList.add('fasterlaw-icon');
+    fasterLawIcon.classList.add('fasterlaw-icon', 'new-ui');
     fasterLawIcon.style.backgroundImage = `url(${getBrowserExtensionAPI().runtime.getURL(
       'src/assets/images/icon-0128.png'
     )})`;
@@ -41,17 +41,28 @@ export class EnhancedDocumentLink {
   }
 
   private createAction(action: Action): HTMLDivElement {
-    const actionElement = document.createElement('div');
-    actionElement.classList.add('action');
-    actionElement.setAttribute('title', action.title);
-    actionElement.innerHTML = `<div class="action-icon ${action.iconClass}"></div> ${action.text}`;
+    const actionContainer = document.createElement('div');
+    actionContainer.classList.add('action');
+    actionContainer.setAttribute('title', action.title);
 
-    actionElement.addEventListener('click', () => {
+    const icon = document.createElement('div');
+    icon.classList.add('action-icon', action.iconClass);
+    icon.style.backgroundImage = `url(${getBrowserExtensionAPI().runtime.getURL(
+      action.iconUrl
+    )})`;
+
+    const text = document.createElement('span');
+    text.textContent = action.text;
+
+    actionContainer.appendChild(icon);
+    actionContainer.appendChild(text);
+
+    actionContainer.addEventListener('click', () => {
       action.onClick();
       this.toggleActionsContainer();
     });
 
-    return actionElement;
+    return actionContainer;
   }
 
   private attachIcon(): void {

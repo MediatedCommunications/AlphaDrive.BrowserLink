@@ -57,6 +57,7 @@ window.addEventListener('message', (message) => {
   }
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function sendMessageToTop(detail: any): void {
   window.parent.postMessage(detail, '*');
 }

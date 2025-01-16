@@ -1,3 +1,9 @@
+import '@/assets/images/adjust-solid.svg';
+import '@/assets/images/download-solid.svg';
+import '@/assets/images/external-link-square-solid.svg';
+import '@/assets/images/folder-open-solid.svg';
+import '@/assets/images/icon-0016.png';
+import '@/assets/images/link-solid.svg';
 import {
   NEW_UI_SELECTOR_DETAILS,
   NEW_UI_SELECTOR_DOWNLOADS,
@@ -76,6 +82,12 @@ export class DocumentLinkManager {
           .forEach((container) => container.classList.remove('open'));
       }
     });
+
+    window.addEventListener('wheel', () => {
+      document
+        .querySelectorAll('.fasterlaw-actions-container')
+        .forEach((container) => container.classList.remove('open'));
+    });
   }
 
   private addActionsToEnhancedLink(
@@ -84,16 +96,20 @@ export class DocumentLinkManager {
   ): void {
     const actions: Action[] = [
       {
+        name: 'Open with faster Suite',
         title: 'Open this document with Faster Suite',
         iconClass: 'faster-suite',
+        iconUrl: 'src/assets/images/icon-0016.png',
         text: 'Open with Faster Suite',
         onClick: () => {
           window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${enhancedLink.docID}`;
         },
       },
       {
+        name: 'Open with Clio Launcher',
         title: 'Open this document with Clio Launcher',
         iconClass: 'clio',
+        iconUrl: 'src/assets/images/external-link-square-solid.svg',
         text: 'Open with Clio Launcher',
         onClick: () => {
           const link = node
@@ -104,8 +120,10 @@ export class DocumentLinkManager {
         },
       },
       {
+        name: 'Download',
         title: 'Download this document',
         iconClass: 'download',
+        iconUrl: 'src/assets/images/download-solid.svg',
         text: 'Download',
         onClick: () => {
           window.open(
@@ -114,24 +132,30 @@ export class DocumentLinkManager {
         },
       },
       {
+        name: 'Locate',
         title: `Open this document's folder using Faster Suite`,
         iconClass: 'locate',
+        iconUrl: 'src/assets/images/folder-open-solid.svg',
         text: 'Locate',
         onClick: () => {
           window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/locate?subject_url=/api/v4/documents/${enhancedLink.docID}`;
         },
       },
       {
+        name: 'Copy Link',
         title: 'Copy a link to this document using Faster Suite',
         iconClass: 'link',
+        iconUrl: 'src/assets/images/link-solid.svg',
         text: 'Copy Link',
         onClick: () => {
           window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/share/link?subject_url=/api/v4/documents/${enhancedLink.docID}`;
         },
       },
       {
+        name: 'Compare / History',
         title: 'Compare this document using Faster Suite',
         iconClass: 'compare',
+        iconUrl: 'src/assets/images/adjust-solid.svg',
         text: 'Compare / History',
         onClick: () => {
           window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/compare?subject_url=/api/v4/documents/${enhancedLink.docID}`;
