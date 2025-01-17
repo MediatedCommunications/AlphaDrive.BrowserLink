@@ -9,7 +9,14 @@ const manifest = defineManifest({
   version: '25.01.05.1926',
   description:
     'Open documents straight from Clio, get free PACER looks, and much, much more.',
-  permissions: ['storage', 'notifications', 'tabs', 'cookies', 'activeTab'],
+  permissions: [
+    'storage',
+    'notifications',
+    'tabs',
+    'cookies',
+    'activeTab',
+    'declarativeNetRequest',
+  ],
   host_permissions: [
     '*://app.clio.com/*',
     '*://au.app.clio.com/*',
