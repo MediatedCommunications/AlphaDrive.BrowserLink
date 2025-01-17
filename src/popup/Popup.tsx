@@ -38,7 +38,6 @@ const Popup: React.FC = () => {
         console.error('Error loading settings:', error);
       } finally {
         setLoading(false);
-        console.log('Settings loaded', initialValues);
       }
     };
     loadSettings();

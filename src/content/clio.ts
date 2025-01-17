@@ -28,8 +28,7 @@ async function observerCallback(
     NEW_UI_SELECTOR_DOWNLOADS,
     NEW_UI_SELECTOR_DETAILS,
   ]);
-  console.log('enhanceSetting', enhanceSetting);
-  console.log('targetUIDetected', targetUIDetected);
+
   const shouldEnhance = enhanceSetting && targetUIDetected;
 
   if (shouldEnhance) {

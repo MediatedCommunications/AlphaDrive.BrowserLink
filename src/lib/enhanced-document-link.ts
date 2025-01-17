@@ -37,6 +37,7 @@ export class EnhancedDocumentLink {
     const actionsContainer = document.createElement('div');
     actionsContainer.classList.add('fasterlaw-actions-container', 'new-ui');
     document.body.appendChild(actionsContainer);
+
     return actionsContainer;
   }
 
@@ -67,7 +68,6 @@ export class EnhancedDocumentLink {
 
   private attachIcon(): void {
     const parentNode = this.node.parentNode as HTMLElement;
-    // const siblingNode = parentNode.querySelector('.launcher-icon');
 
     // New UI specific logic
     if (this.uiVersion === UiVersion.New) {
@@ -95,18 +95,18 @@ export class EnhancedDocumentLink {
     });
 
     this.node.addEventListener('mousedown', async (event) => {
-      const isDisabled = await this.isExtensionDisabled();
+      const isEnabled = await getSetting('clio_open_docs');
 
-      if (!isDisabled) {
+      if (isEnabled) {
+        console.log(this.docID);
         event.preventDefault();
         event.stopPropagation();
-        window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${this._docID}`;
+        window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${this.docID}`;
       }
     });
   }
 
   private toggleActionsContainer(): void {
-    console.log('toggleActionsContainer');
     document
       .querySelectorAll('.fasterlaw-actions-container')
       .forEach((container) => {
@@ -126,11 +126,6 @@ export class EnhancedDocumentLink {
       ? `${rect.top + win.scrollY - 200}px`
       : `${rect.top + win.scrollY + 20}px`;
     this.actionsContainer.style.left = `${rect.left + win.scrollX}px`;
-  }
-
-  private async isExtensionDisabled(): Promise<boolean> {
-    const setting = await getSetting('clio_open_docs');
-    return setting ? false : true;
   }
 
   public addActions(actions: Action[]): void {

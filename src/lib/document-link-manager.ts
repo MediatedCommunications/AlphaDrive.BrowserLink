@@ -62,7 +62,7 @@ export class DocumentLinkManager {
         const docIdMatch = docIdRegEx.exec(docIdAttr);
         docID = docIdMatch ? docIdMatch[1] : '';
       } else {
-        docID = node.closest('tr')?.getAttribute('id') || '';
+        docID = node.closest('span')?.getAttribute('id') || '';
       }
       documentLinks.push({ node, docID });
     });
@@ -115,7 +115,7 @@ export class DocumentLinkManager {
           const link = node
             .closest('td')
             ?.querySelector('a[ng-click*="Launcher" i]') as HTMLAnchorElement;
-          console.log('link', node, link);
+
           link?.click();
         },
       },

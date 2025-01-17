@@ -29,8 +29,6 @@ export async function updateAppIcon(
   const settings = { ...(await getSettings()), ...newSettings };
   const activeTab = tab ?? (await getActiveTab());
 
-  console.log('updateAppIcon', settings, activeTab);
-
   if (!activeTab || !activeTab.url) {
     return;
   }
