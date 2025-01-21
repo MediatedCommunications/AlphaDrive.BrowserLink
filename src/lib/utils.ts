@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getBrowserExtensionAPI(): typeof chrome {
+export function browserExtensionAPI(): typeof chrome {
   if (typeof chrome !== 'undefined') {
     return chrome;
   }
@@ -42,7 +42,7 @@ export async function updateAppIcon(
   if ((settings.clio_enhance_docs || settings.clio_open_docs) && isClioPage) {
     chrome.action.setIcon({
       tabId: activeTab.id,
-      path: getBrowserExtensionAPI().runtime.getURL(
+      path: browserExtensionAPI().runtime.getURL(
         'src/assets/images/icon-0128.png'
       ),
     });
@@ -57,7 +57,7 @@ export async function updateAppIcon(
   ) {
     chrome.action.setIcon({
       tabId: activeTab.id,
-      path: getBrowserExtensionAPI().runtime.getURL(
+      path: browserExtensionAPI().runtime.getURL(
         'src/assets/images/icon-0128.png'
       ),
     });
@@ -68,7 +68,7 @@ export async function updateAppIcon(
   } else {
     chrome.action.setIcon({
       tabId: activeTab.id,
-      path: getBrowserExtensionAPI().runtime.getURL(
+      path: browserExtensionAPI().runtime.getURL(
         'src/assets/images/icon-0128-disabled.png'
       ),
     });

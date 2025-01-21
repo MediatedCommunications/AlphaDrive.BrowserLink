@@ -46,9 +46,6 @@ const manifest = defineManifest({
       matches: [],
     },
   ],
-  icons: {
-    128: 'src/assets/images/icon-0128-disabled.png',
-  },
 });
 
 // https://vite.dev/config/

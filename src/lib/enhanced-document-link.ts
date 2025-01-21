@@ -1,7 +1,7 @@
 import '@/assets/images/icon-0128.png';
 import { Action, DocumentLink, UiVersion } from '@/types/clio';
 import { getSetting } from './settings';
-import { getBrowserExtensionAPI } from './utils';
+import { browserExtensionAPI } from './utils';
 
 export class EnhancedDocumentLink {
   private node: HTMLElement;
@@ -27,7 +27,7 @@ export class EnhancedDocumentLink {
   private createFasterLawIcon(): HTMLDivElement {
     const fasterLawIcon = document.createElement('div');
     fasterLawIcon.classList.add('fasterlaw-icon', 'new-ui');
-    fasterLawIcon.style.backgroundImage = `url(${getBrowserExtensionAPI().runtime.getURL(
+    fasterLawIcon.style.backgroundImage = `url(${browserExtensionAPI().runtime.getURL(
       'src/assets/images/icon-0128.png'
     )})`;
     return fasterLawIcon;
@@ -48,7 +48,7 @@ export class EnhancedDocumentLink {
 
     const icon = document.createElement('div');
     icon.classList.add('action-icon', action.iconClass);
-    icon.style.backgroundImage = `url(${getBrowserExtensionAPI().runtime.getURL(
+    icon.style.backgroundImage = `url(${browserExtensionAPI().runtime.getURL(
       action.iconUrl
     )})`;
 
@@ -76,9 +76,11 @@ export class EnhancedDocumentLink {
       const targetViewElement = pTr?.querySelector('cc-document-actions')
         ?.parentNode as HTMLElement;
 
-      targetViewElement.classList.add('fasterlaw-icon-host');
+      if (targetViewElement) {
+        targetViewElement.classList.add('fasterlaw-icon-host');
 
-      targetViewElement.append(this.fasterLawIcon);
+        targetViewElement.append(this.fasterLawIcon);
+      }
     } else {
       // Old UI logic
       parentNode.style.display = 'flex';
@@ -98,9 +100,9 @@ export class EnhancedDocumentLink {
       const isEnabled = await getSetting('clio_open_docs');
 
       if (isEnabled) {
-        console.log(this.docID);
         event.preventDefault();
         event.stopPropagation();
+        event.stopImmediatePropagation();
         window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${this.docID}`;
       }
     });

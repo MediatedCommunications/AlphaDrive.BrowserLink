@@ -79,14 +79,14 @@ export class DocumentLinkManager {
       ) {
         document
           .querySelectorAll('.fasterlaw-actions-container')
-          .forEach((container) => container.classList.remove('open'));
+          .forEach((container) => container?.classList.remove('open'));
       }
     });
 
     window.addEventListener('wheel', () => {
       document
         .querySelectorAll('.fasterlaw-actions-container')
-        .forEach((container) => container.classList.remove('open'));
+        .forEach((container) => container?.classList.remove('open'));
     });
   }
 
