@@ -1,0 +1,62 @@
+name: Deploy Extension
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger the workflow on tags starting with 'v'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*' # Use the latest LTS version of Node.js
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build extension
+        run: npm run build # Replace with your actual build command
+
+      - name: Get the version
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF/refs\/tags\//}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update manifest.json
+        run: |
+          jq '.version = "${{ steps.get_version.outputs.version }}" | sponge manifest.json
+
+      - name: Zip extension
+        run: zip -r my-extension-v${{ steps.get_version.outputs.version }}.zip dist # Replace 'my-extension' with your extension's name
+
+      - name: Deploy to Chrome Web Store
+        uses: chrome-webstore-upload/action@v2
+        with:
+          extension-zip: my-extension-v${{ steps.get_version.outputs.version }}.zip
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+
+      - name: Deploy to Firefox Add-ons
+        uses: wdzeng/firefox-addon@v1
+        with:
+          addon-guid: your-addon's-guid
+          xpi-path: your-addon.zip
+          self-hosted: false
+          jwt-issuer: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          jwt-secret: ${{ secrets.FIREFOX_JWT_SECRET }}
+
+      - name: Deploy to Edge Add-ons
+        uses: wdzeng/edge-addon@v2
+        with:
+          product-id: your-addon-product-id
+          zip-path: your-addon.zip
+          api-key: ${{ secrets.API_KEY }}
+          client-id: ${{ secrets.CLIENT_ID }}
