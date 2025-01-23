@@ -1,12 +1,12 @@
 import '@/assets/images/icon-0128.png';
-import { Action, DocumentLink, UiVersion } from '@/types/clio';
+import { Action, DocumentLink, LinkType } from '@/types/clio';
 import { getSetting } from './settings';
 import { browserExtensionAPI } from './utils';
 
 export class EnhancedDocumentLink {
   private node: HTMLElement;
   private _docID: string;
-  private uiVersion: UiVersion;
+  private linkType: LinkType;
   private fasterLawIcon: HTMLDivElement;
   private actionsContainer: HTMLDivElement;
 
@@ -14,13 +14,14 @@ export class EnhancedDocumentLink {
     return this._docID;
   }
 
-  constructor(documentLink: DocumentLink, uiVersion: UiVersion) {
+  constructor(documentLink: DocumentLink) {
     this.node = documentLink.node;
     this._docID = documentLink.docID;
-    this.uiVersion = uiVersion;
+    this.linkType = documentLink.linkType;
     this.fasterLawIcon = this.createFasterLawIcon();
     this.actionsContainer = this.createActionsContainer();
     this.attachIcon();
+    this.addOpenWithFasterSuiteLink();
     this.attachEventListeners();
   }
 
@@ -68,26 +69,28 @@ export class EnhancedDocumentLink {
 
   private attachIcon(): void {
     const parentNode = this.node.parentNode as HTMLElement;
+    const closestRow = parentNode.closest('tr');
+    const targetViewElement = closestRow?.querySelector('cc-document-actions')
+      ?.parentNode as HTMLElement;
 
-    // New UI specific logic
-    if (this.uiVersion === UiVersion.New) {
-      const pTd = parentNode.closest('td');
-      const pTr = pTd?.closest('tr');
-      const targetViewElement = pTr?.querySelector('cc-document-actions')
-        ?.parentNode as HTMLElement;
+    if (targetViewElement) {
+      targetViewElement.classList.add('fasterlaw-icon-host');
 
-      if (targetViewElement) {
-        targetViewElement.classList.add('fasterlaw-icon-host');
+      // Style existing elements
+      const lastBtn = targetViewElement.querySelector(
+        'button.th-button:last-of-type'
+      ) as HTMLElement;
+      lastBtn.style.borderTopRightRadius = '0';
+      lastBtn.style.borderBottomRightRadius = '0';
 
-        targetViewElement.append(this.fasterLawIcon);
-      }
-    } else {
-      // Old UI logic
-      parentNode.style.display = 'flex';
-      parentNode.style.alignItems = 'center';
-      this.fasterLawIcon.style.margin = '0 8px';
-      parentNode.append(this.fasterLawIcon);
+      targetViewElement.append(this.fasterLawIcon);
     }
+  }
+
+  private addOpenWithFasterSuiteLink(): void {
+    if (this.linkType !== 'details') return;
+
+    const link = document.createElement('a');
   }
 
   private attachEventListeners(): void {

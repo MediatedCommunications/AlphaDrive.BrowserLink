@@ -1,13 +1,5 @@
-import {
-  NEW_UI_SELECTOR_DETAILS,
-  NEW_UI_SELECTOR_DOWNLOADS,
-  OLD_UI_SELECTOR,
-} from '@/constants';
 import { DocumentLinkManager } from '@/lib/document-link-manager';
-import { getSetting } from '@/lib/settings';
 import { ToastManager } from '@/lib/toast-manager';
-import { checkAnySelector } from '@/lib/utils';
-import { UiVersion } from '@/types/clio';
 import './clio.css';
 
 const documentLinkManager = new DocumentLinkManager();
@@ -22,24 +14,7 @@ async function observerCallback(
   _mutationsList: MutationRecord[],
   observer: MutationObserver
 ) {
-  const enhanceSetting = await getSetting('clio_enhance_docs');
-  const targetUIDetected = checkAnySelector([
-    OLD_UI_SELECTOR,
-    NEW_UI_SELECTOR_DOWNLOADS,
-    NEW_UI_SELECTOR_DETAILS,
-  ]);
-
-  const shouldEnhance = enhanceSetting && targetUIDetected;
-
-  if (shouldEnhance) {
-    const uiVersion = checkAnySelector([
-      NEW_UI_SELECTOR_DOWNLOADS,
-      NEW_UI_SELECTOR_DETAILS,
-    ])
-      ? UiVersion.New
-      : UiVersion.Old;
-    documentLinkManager.enhanceDocumentLinks(uiVersion);
-  }
+  documentLinkManager.enhanceDocumentLinks();
 
   // Continue observing for future changes
   observer.observe(document.body, observerConfig);
