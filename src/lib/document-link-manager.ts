@@ -53,7 +53,9 @@ export class DocumentLinkManager {
     );
 
     const detailsDocLinks = this.toDocumentLink(
-      Array.from(document.querySelectorAll('a') as NodeListOf<HTMLElement>)
+      Array.from(
+        document.querySelectorAll('a.clio-ui-link') as NodeListOf<HTMLElement>
+      )
         .filter((link) => link.hasAttribute('x-on:click'))
         .filter((node) => !enhancedNodesSet.has(node)),
       'details'

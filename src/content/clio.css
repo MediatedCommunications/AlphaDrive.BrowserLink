@@ -50,7 +50,7 @@
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  background-origin: content-box; 
+  background-origin: content-box;
   padding: 5px 0;
   cursor: pointer;
   margin: 0;
@@ -185,4 +185,17 @@
 
 .fasterlaw-actions-container .action-icon.faster-suite {
   opacity: 1;
+}
+
+.fasterlaw-details-open-link-host {
+  display: flex;
+  gap: 10px;
+}
+
+.fasterlaw-details-open-link {
+  margin-right: 0.5em;
+}
+
+.fasterlaw-details-open-link-icon {
+  color: #006edb;
 }

@@ -80,8 +80,11 @@ export class EnhancedDocumentLink {
       const lastBtn = targetViewElement.querySelector(
         'button.th-button:last-of-type'
       ) as HTMLElement;
-      lastBtn.style.borderTopRightRadius = '0';
-      lastBtn.style.borderBottomRightRadius = '0';
+
+      if (lastBtn) {
+        lastBtn.style.borderTopRightRadius = '0';
+        lastBtn.style.borderBottomRightRadius = '0';
+      }
 
       targetViewElement.append(this.fasterLawIcon);
     }
@@ -90,7 +93,28 @@ export class EnhancedDocumentLink {
   private addOpenWithFasterSuiteLink(): void {
     if (this.linkType !== 'details') return;
 
+    const linkContainer = document.createElement('div');
     const link = document.createElement('a');
+    const icon = document.createElement('i');
+    const parentNode = this.node.parentNode as HTMLElement;
+
+    parentNode.classList.add('fasterlaw-details-open-link-host');
+
+    icon.setAttribute('aria-hidden', 'true');
+    icon.setAttribute('role', 'img');
+    icon.classList.add('fa-solid', 'fa-external-link', 'suffix-icon', 'fasterlaw-details-open-link-icon');
+
+    link.classList.add('fasterlaw-details-open-link');
+    link.textContent = 'Open with Faster Suite';
+
+    link.addEventListener('click', async () => {
+      window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${this.docID}`;
+    });
+
+    linkContainer.appendChild(link);
+    linkContainer.appendChild(icon);
+
+    this.node.parentNode?.appendChild(linkContainer);
   }
 
   private attachEventListeners(): void {
@@ -102,7 +126,7 @@ export class EnhancedDocumentLink {
     this.node.addEventListener('mousedown', async (event) => {
       const isEnabled = await getSetting('clio_open_docs');
 
-      if (isEnabled) {
+      if (isEnabled && this.linkType !== 'details') {
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();

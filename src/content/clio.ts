@@ -14,6 +14,8 @@ async function observerCallback(
   _mutationsList: MutationRecord[],
   observer: MutationObserver
 ) {
+  observer.disconnect();
+
   documentLinkManager.enhanceDocumentLinks();
 
   // Continue observing for future changes
