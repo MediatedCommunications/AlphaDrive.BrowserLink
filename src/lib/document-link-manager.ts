@@ -4,12 +4,6 @@ import '@/assets/images/external-link-square-solid.svg';
 import '@/assets/images/folder-open-solid.svg';
 import '@/assets/images/icon-0016.png';
 import '@/assets/images/link-solid.svg';
-import {
-  CLIO_DETAILS_VIEW_DOC_ID_REGEX,
-  CLIO_DOCUMENTS_DOC_ID_REGEX,
-  CLIO_EXTERNAL_DOCUMENTS_DOC_ID_REGEX,
-  CLIO_SEARCH_RESULTS_DOC_ID_REGEX,
-} from '@/constants';
 import { Action, DocumentLink, LinkType } from '@/types/clio';
 import { EnhancedDocumentLink } from './enhanced-document-link';
 
@@ -85,66 +79,70 @@ export class DocumentLinkManager {
   }
 
   private extractDocumentId(node: HTMLElement, linkType: LinkType): string {
+    let docId;
+
     switch (linkType) {
       case 'documents': {
         const href = node.getAttribute('href');
-        const regex = CLIO_DOCUMENTS_DOC_ID_REGEX;
+        const regex = /\/documents\/(\d+)/;
         const match = href?.match(regex);
 
         if (match) {
-          return match[1];
+          docId = match[1];
         }
-
-        return 'id not found';
+        break;
       }
 
       case 'search-results': {
         const href = node.getAttribute('href');
-        const regex = CLIO_SEARCH_RESULTS_DOC_ID_REGEX;
+        const regex = /\/documents\/(\d+)\/details/;
         const match = href?.match(regex);
 
         if (match) {
-          return match[1];
+          docId = match[1];
         }
 
-        return 'id not found';
+        break;
       }
 
       case 'external': {
         const href = node.getAttribute('href');
-        const regex = CLIO_EXTERNAL_DOCUMENTS_DOC_ID_REGEX;
+        const regex = /\/external_documents\/(\d+)/;
         const match = href?.match(regex);
 
         if (match) {
-          return match[1];
+          docId = match[1];
         }
-        return 'id not found';
+        break;
       }
 
       case 'details': {
         const clickHandler = node.getAttribute('x-on:click');
-        const regex = CLIO_DETAILS_VIEW_DOC_ID_REGEX;
+        const regex =
+          /\$documentsRedirect\.handleLauncherClick\(\s*'true',\s*'[^']*',\s*'(\d+)'/;
         const match = clickHandler?.match(regex);
 
         if (match) {
-          return match[1];
+          docId = match[1];
         }
 
-        return 'id not found';
-      }
-
-      default: {
-        const docIdRegEx = /{\s?id:\s?(\d+)\s?}/gm;
-        const docIdAttr = node.getAttribute('ui-sref') || '';
-        const docIdMatch = docIdRegEx.exec(docIdAttr);
-
-        if (docIdMatch) {
-          return docIdMatch[1];
-        } else {
-          return node.closest('span')?.getAttribute('id') || '';
-        }
+        break;
       }
     }
+
+    if (!docId) {
+      const docIdRegEx = /{\s?id:\s?(\d+)\s?}/gm;
+      const docIdAttr = node.getAttribute('ui-sref') || '';
+      const docIdMatch = docIdRegEx.exec(docIdAttr);
+
+      if (docIdMatch) {
+        docId = docIdMatch[1];
+      } else {
+        return node.closest('span')?.getAttribute('id') || 'id not found';
+      }
+    }
+
+    return docId;
   }
 
   private clickOutsideEventBinding(): void {
