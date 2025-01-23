@@ -8,12 +8,9 @@ export interface Action {
 }
 
 export interface DocumentLink {
+  linkType: LinkType;
   node: HTMLElement;
   docID: string;
 }
 
-export enum UiVersion {
-  Old,
-  New,
-  SearchResult,
-}
+export type LinkType = 'documents' | 'search-results' | 'external' | 'details';

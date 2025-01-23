@@ -4,70 +4,147 @@ import '@/assets/images/external-link-square-solid.svg';
 import '@/assets/images/folder-open-solid.svg';
 import '@/assets/images/icon-0016.png';
 import '@/assets/images/link-solid.svg';
-import {
-  NEW_UI_SELECTOR_DETAILS,
-  NEW_UI_SELECTOR_DOWNLOADS,
-  OLD_UI_SELECTOR,
-} from '@/constants';
-import { Action, DocumentLink, UiVersion } from '@/types/clio';
+import { Action, DocumentLink, LinkType } from '@/types/clio';
 import { EnhancedDocumentLink } from './enhanced-document-link';
 
 export class DocumentLinkManager {
   private enhancedNodes: HTMLElement[] = [];
 
-  public enhanceDocumentLinks(uiVersion: UiVersion): void {
-    const documentLinks = this.getDocumentLinks(uiVersion);
+  public enhanceDocumentLinks(): void {
+    const documentLinks = this.getDocumentLinks();
 
     documentLinks.forEach((documentLink) => {
-      if (!this.enhancedNodes.includes(documentLink.node)) {
-        const enhancedLink = new EnhancedDocumentLink(documentLink, uiVersion);
-        this.addActionsToEnhancedLink(enhancedLink, documentLink.node);
-        this.enhancedNodes.push(documentLink.node);
-      }
+      const enhancedLink = new EnhancedDocumentLink(documentLink);
+      this.addActionsToEnhancedLink(enhancedLink, documentLink.node);
+      this.enhancedNodes.push(documentLink.node);
     });
 
     this.clickOutsideEventBinding();
   }
 
-  private getDocumentLinks(uiVersion: UiVersion): DocumentLink[] {
-    let nodes: NodeListOf<HTMLElement>;
+  private getDocumentLinks(): DocumentLink[] {
+    const enhancedNodesSet = new Set(this.enhancedNodes);
 
-    if (uiVersion === UiVersion.New) {
-      nodes = document.querySelectorAll(
-        `${NEW_UI_SELECTOR_DOWNLOADS}, ${NEW_UI_SELECTOR_DETAILS}`
-      );
+    const documentDocLinks = this.toDocumentLink(
+      Array.from(
+        document.querySelectorAll(
+          'a[href*="/download"]'
+        ) as NodeListOf<HTMLElement>
+      ).filter((node) => !enhancedNodesSet.has(node)),
+      'documents'
+    );
 
-      return this.extractDocumentLinks(nodes, uiVersion);
-    } else if (uiVersion === UiVersion.Old) {
-      nodes = document.querySelectorAll(OLD_UI_SELECTOR);
+    const searchDocLinks = this.toDocumentLink(
+      Array.from(
+        document.querySelectorAll(
+          'a[href*="/details"]'
+        ) as NodeListOf<HTMLElement>
+      ).filter((node) => !enhancedNodesSet.has(node)),
+      'search-results'
+    );
 
-      return this.extractDocumentLinks(nodes, uiVersion);
-    }
+    const externalDocLinks = this.toDocumentLink(
+      Array.from(
+        document.querySelectorAll(
+          `a[href*="/external_documents"`
+        ) as NodeListOf<HTMLElement>
+      ).filter((node) => !enhancedNodesSet.has(node)),
+      'external'
+    );
 
-    return [];
+    const detailsDocLinks = this.toDocumentLink(
+      Array.from(
+        document.querySelectorAll('a.clio-ui-link') as NodeListOf<HTMLElement>
+      )
+        .filter((link) => link.hasAttribute('x-on:click'))
+        .filter((node) => !enhancedNodesSet.has(node)),
+      'details'
+    );
+
+    return [
+      ...documentDocLinks,
+      ...searchDocLinks,
+      ...externalDocLinks,
+      ...detailsDocLinks,
+    ];
   }
 
-  private extractDocumentLinks(
-    nodes: NodeListOf<HTMLElement>,
-    uiVersion: UiVersion
+  private toDocumentLink(
+    nodes: HTMLElement[],
+    linkType: LinkType
   ): DocumentLink[] {
-    const documentLinks: DocumentLink[] = [];
+    return nodes.map((node) => ({
+      node: node as HTMLElement,
+      docID: this.extractDocumentId(node, linkType),
+      linkType,
+    }));
+  }
 
-    nodes.forEach((node) => {
-      let docID: string = '';
+  private extractDocumentId(node: HTMLElement, linkType: LinkType): string {
+    let docId;
 
-      if (uiVersion === UiVersion.SearchResult) {
-        const docIdRegEx = /{\s?id:\s?(\d+)\s?}/gm;
-        const docIdAttr = node.getAttribute('ui-sref') || '';
-        const docIdMatch = docIdRegEx.exec(docIdAttr);
-        docID = docIdMatch ? docIdMatch[1] : '';
-      } else {
-        docID = node.closest('span')?.getAttribute('id') || '';
+    switch (linkType) {
+      case 'documents': {
+        const href = node.getAttribute('href');
+        const regex = /\/documents\/(\d+)/;
+        const match = href?.match(regex);
+
+        if (match) {
+          docId = match[1];
+        }
+        break;
       }
-      documentLinks.push({ node, docID });
-    });
 
-    return documentLinks;
+      case 'search-results': {
+        const href = node.getAttribute('href');
+        const regex = /\/documents\/(\d+)\/details/;
+        const match = href?.match(regex);
+
+        if (match) {
+          docId = match[1];
+        }
+
+        break;
+      }
+
+      case 'external': {
+        const href = node.getAttribute('href');
+        const regex = /\/external_documents\/(\d+)/;
+        const match = href?.match(regex);
+
+        if (match) {
+          docId = match[1];
+        }
+        break;
+      }
+
+      case 'details': {
+        const clickHandler = node.getAttribute('x-on:click');
+        const regex =
+          /\$documentsRedirect\.handleLauncherClick\(\s*'true',\s*'[^']*',\s*'(\d+)'/;
+        const match = clickHandler?.match(regex);
+
+        if (match) {
+          docId = match[1];
+        }
+
+        break;
+      }
+    }
+
+    if (!docId) {
+      const docIdRegEx = /{\s?id:\s?(\d+)\s?}/gm;
+      const docIdAttr = node.getAttribute('ui-sref') || '';
+      const docIdMatch = docIdRegEx.exec(docIdAttr);
+
+      if (docIdMatch) {
+        docId = docIdMatch[1];
+      } else {
+        return node.closest('span')?.getAttribute('id') || 'id not found';
+      }
+    }
+
+    return docId;
   }
 
   private clickOutsideEventBinding(): void {

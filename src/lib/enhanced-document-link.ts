@@ -1,12 +1,12 @@
 import '@/assets/images/icon-0128.png';
-import { Action, DocumentLink, UiVersion } from '@/types/clio';
+import { Action, DocumentLink, LinkType } from '@/types/clio';
 import { getSetting } from './settings';
 import { browserExtensionAPI } from './utils';
 
 export class EnhancedDocumentLink {
   private node: HTMLElement;
   private _docID: string;
-  private uiVersion: UiVersion;
+  private linkType: LinkType;
   private fasterLawIcon: HTMLDivElement;
   private actionsContainer: HTMLDivElement;
 
@@ -14,13 +14,14 @@ export class EnhancedDocumentLink {
     return this._docID;
   }
 
-  constructor(documentLink: DocumentLink, uiVersion: UiVersion) {
+  constructor(documentLink: DocumentLink) {
     this.node = documentLink.node;
     this._docID = documentLink.docID;
-    this.uiVersion = uiVersion;
+    this.linkType = documentLink.linkType;
     this.fasterLawIcon = this.createFasterLawIcon();
     this.actionsContainer = this.createActionsContainer();
     this.attachIcon();
+    this.addOpenWithFasterSuiteLink();
     this.attachEventListeners();
   }
 
@@ -68,26 +69,52 @@ export class EnhancedDocumentLink {
 
   private attachIcon(): void {
     const parentNode = this.node.parentNode as HTMLElement;
+    const closestRow = parentNode.closest('tr');
+    const targetViewElement = closestRow?.querySelector('cc-document-actions')
+      ?.parentNode as HTMLElement;
 
-    // New UI specific logic
-    if (this.uiVersion === UiVersion.New) {
-      const pTd = parentNode.closest('td');
-      const pTr = pTd?.closest('tr');
-      const targetViewElement = pTr?.querySelector('cc-document-actions')
-        ?.parentNode as HTMLElement;
+    if (targetViewElement) {
+      targetViewElement.classList.add('fasterlaw-icon-host');
 
-      if (targetViewElement) {
-        targetViewElement.classList.add('fasterlaw-icon-host');
+      // Style existing elements
+      const lastBtn = targetViewElement.querySelector(
+        'button.th-button:last-of-type'
+      ) as HTMLElement;
 
-        targetViewElement.append(this.fasterLawIcon);
+      if (lastBtn) {
+        lastBtn.style.borderTopRightRadius = '0';
+        lastBtn.style.borderBottomRightRadius = '0';
       }
-    } else {
-      // Old UI logic
-      parentNode.style.display = 'flex';
-      parentNode.style.alignItems = 'center';
-      this.fasterLawIcon.style.margin = '0 8px';
-      parentNode.append(this.fasterLawIcon);
+
+      targetViewElement.append(this.fasterLawIcon);
     }
+  }
+
+  private addOpenWithFasterSuiteLink(): void {
+    if (this.linkType !== 'details') return;
+
+    const linkContainer = document.createElement('div');
+    const link = document.createElement('a');
+    const icon = document.createElement('i');
+    const parentNode = this.node.parentNode as HTMLElement;
+
+    parentNode.classList.add('fasterlaw-details-open-link-host');
+
+    icon.setAttribute('aria-hidden', 'true');
+    icon.setAttribute('role', 'img');
+    icon.classList.add('fa-solid', 'fa-external-link', 'suffix-icon', 'fasterlaw-details-open-link-icon');
+
+    link.classList.add('fasterlaw-details-open-link');
+    link.textContent = 'Open with Faster Suite';
+
+    link.addEventListener('click', async () => {
+      window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${this.docID}`;
+    });
+
+    linkContainer.appendChild(link);
+    linkContainer.appendChild(icon);
+
+    this.node.parentNode?.appendChild(linkContainer);
   }
 
   private attachEventListeners(): void {
@@ -99,7 +126,7 @@ export class EnhancedDocumentLink {
     this.node.addEventListener('mousedown', async (event) => {
       const isEnabled = await getSetting('clio_open_docs');
 
-      if (isEnabled) {
+      if (isEnabled && this.linkType !== 'details') {
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();
