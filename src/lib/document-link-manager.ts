@@ -9,6 +9,7 @@ import { EnhancedDocumentLink } from './enhanced-document-link';
 
 export class DocumentLinkManager {
   private enhancedNodes: HTMLElement[] = [];
+  private enhancedLinks: EnhancedDocumentLink[] = [];
 
   public enhanceDocumentLinks(): void {
     const documentLinks = this.getDocumentLinks();
@@ -17,49 +18,59 @@ export class DocumentLinkManager {
       const enhancedLink = new EnhancedDocumentLink(documentLink);
       this.addActionsToEnhancedLink(enhancedLink, documentLink.node);
       this.enhancedNodes.push(documentLink.node);
+      this.enhancedLinks.push(enhancedLink);
     });
 
     this.clickOutsideEventBinding();
   }
 
+  public enableEnhancedLinks(): void {
+    console.log('Enhanced links toggled');
+
+    this.enhancedLinks.forEach((link) => {
+      link.setEnhance(true);
+    });
+  }
+
+  public disableEnhancedLinks(): void {
+    this.enhancedLinks.forEach((link) => {
+      link.setEnhance(false);
+    });
+  }
+
   private getDocumentLinks(): DocumentLink[] {
     const enhancedNodesSet = new Set(this.enhancedNodes);
 
-    const documentDocLinks = this.toDocumentLink(
-      Array.from(
-        document.querySelectorAll(
-          'a[href*="/download"]'
-        ) as NodeListOf<HTMLElement>
-      ).filter((node) => !enhancedNodesSet.has(node)),
-      'documents'
-    );
+    const documentDocLinks = Array.from(
+      document.querySelectorAll(
+        'a[href*="/download"]'
+      ) as NodeListOf<HTMLElement>
+    )
+      .filter((node) => !enhancedNodesSet.has(node))
+      .map((node) => this.toDocumentLink(node, 'documents'));
 
-    const searchDocLinks = this.toDocumentLink(
-      Array.from(
-        document.querySelectorAll(
-          'a[href*="/details"]'
-        ) as NodeListOf<HTMLElement>
-      ).filter((node) => !enhancedNodesSet.has(node)),
-      'search-results'
-    );
+    const searchDocLinks = Array.from(
+      document.querySelectorAll(
+        'a[href*="/details"]'
+      ) as NodeListOf<HTMLElement>
+    )
+      .filter((node) => !enhancedNodesSet.has(node))
+      .map((node) => this.toDocumentLink(node, 'search-results'));
 
-    const externalDocLinks = this.toDocumentLink(
-      Array.from(
-        document.querySelectorAll(
-          `a[href*="/external_documents"`
-        ) as NodeListOf<HTMLElement>
-      ).filter((node) => !enhancedNodesSet.has(node)),
-      'external'
-    );
+    const externalDocLinks = Array.from(
+      document.querySelectorAll(
+        `a[href*="/external_documents"`
+      ) as NodeListOf<HTMLElement>
+    )
+      .filter((node) => !enhancedNodesSet.has(node))
+      .map((node) => this.toDocumentLink(node, 'external'));
 
-    const detailsDocLinks = this.toDocumentLink(
-      Array.from(
-        document.querySelectorAll('a.clio-ui-link') as NodeListOf<HTMLElement>
-      )
-        .filter((link) => link.hasAttribute('x-on:click'))
-        .filter((node) => !enhancedNodesSet.has(node)),
-      'details'
-    );
+    const detailsDocLinks = Array.from(
+      document.querySelectorAll('a.clio-ui-link') as NodeListOf<HTMLElement>
+    )
+      .filter((link) => link.hasAttribute('x-on:click'))
+      .filter((node) => !enhancedNodesSet.has(node))
+      .map((node) => this.toDocumentLink(node, 'details'));
 
     return [
       ...documentDocLinks,
@@ -69,15 +80,12 @@ export class DocumentLinkManager {
     ];
   }
 
-  private toDocumentLink(
-    nodes: HTMLElement[],
-    linkType: LinkType
-  ): DocumentLink[] {
-    return nodes.map((node) => ({
-      node: node as HTMLElement,
+  private toDocumentLink(node: HTMLElement, linkType: LinkType): DocumentLink {
+    return {
+      node,
       docID: this.extractDocumentId(node, linkType),
       linkType,
-    }));
+    };
   }
 
   private extractDocumentId(node: HTMLElement, linkType: LinkType): string {

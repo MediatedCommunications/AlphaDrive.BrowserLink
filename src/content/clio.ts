@@ -22,6 +22,22 @@ async function observerCallback(
   observer.observe(document.body, observerConfig);
 }
 
+// Sub to settings changes
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'local') {
+    if (changes.clio_enhance_docs) {
+      const newValue = changes.clio_enhance_docs.newValue;
+
+      if (newValue) {
+        documentLinkManager.enableEnhancedLinks();
+      } else {
+        documentLinkManager.disableEnhancedLinks();
+      }
+    }
+  }
+});
+
+// Messaging
 window.addEventListener('message', (message) => {
   if (window.self === window.top) {
     const detail = message.data;
