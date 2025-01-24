@@ -4,18 +4,32 @@ import { getSetting } from './settings';
 import { browserExtensionAPI } from './utils';
 
 export class EnhancedDocumentLink {
-  private node: HTMLElement;
+  private _node: HTMLElement;
   private _docID: string;
   private linkType: LinkType;
   private fasterLawIcon: HTMLDivElement;
   private actionsContainer: HTMLDivElement;
+  private enhanced = false;
+  private downloadsEnabled = false;
+
+  public get node(): HTMLElement {
+    return this._node;
+  }
 
   public get docID(): string {
     return this._docID;
   }
 
+  public get isEnhanced(): boolean {
+    return this.enhanced;
+  }
+
+  public get isDownloadsEnabled(): boolean {
+    return this.downloadsEnabled;
+  }
+
   constructor(documentLink: DocumentLink) {
-    this.node = documentLink.node;
+    this._node = documentLink.node;
     this._docID = documentLink.docID;
     this.linkType = documentLink.linkType;
     this.fasterLawIcon = this.createFasterLawIcon();
@@ -23,6 +37,16 @@ export class EnhancedDocumentLink {
     this.attachIcon();
     this.addOpenWithFasterSuiteLink();
     this.attachEventListeners();
+  }
+
+  public setEnhance(val: boolean): void {
+    if (val) {
+      this.fasterLawIcon.style.display = 'flex';
+      this.enhanced = true;
+    } else {
+      this.fasterLawIcon.style.display = 'none';
+      this.enhanced = false;
+    }
   }
 
   private createFasterLawIcon(): HTMLDivElement {
@@ -67,8 +91,8 @@ export class EnhancedDocumentLink {
     return actionContainer;
   }
 
-  private attachIcon(): void {
-    const parentNode = this.node.parentNode as HTMLElement;
+  private async attachIcon(): Promise<void> {
+    const parentNode = this._node.parentNode as HTMLElement;
     const closestRow = parentNode.closest('tr');
     const targetViewElement = closestRow?.querySelector('cc-document-actions')
       ?.parentNode as HTMLElement;
@@ -86,6 +110,9 @@ export class EnhancedDocumentLink {
         lastBtn.style.borderBottomRightRadius = '0';
       }
 
+      const enhance = await getSetting('clio_enhance_docs');
+      this.setEnhance(enhance ?? false);
+
       targetViewElement.append(this.fasterLawIcon);
     }
   }
@@ -96,13 +123,18 @@ export class EnhancedDocumentLink {
     const linkContainer = document.createElement('div');
     const link = document.createElement('a');
     const icon = document.createElement('i');
-    const parentNode = this.node.parentNode as HTMLElement;
+    const parentNode = this._node.parentNode as HTMLElement;
 
     parentNode.classList.add('fasterlaw-details-open-link-host');
 
     icon.setAttribute('aria-hidden', 'true');
     icon.setAttribute('role', 'img');
-    icon.classList.add('fa-solid', 'fa-external-link', 'suffix-icon', 'fasterlaw-details-open-link-icon');
+    icon.classList.add(
+      'fa-solid',
+      'fa-external-link',
+      'suffix-icon',
+      'fasterlaw-details-open-link-icon'
+    );
 
     link.classList.add('fasterlaw-details-open-link');
     link.textContent = 'Open with Faster Suite';
@@ -114,7 +146,7 @@ export class EnhancedDocumentLink {
     linkContainer.appendChild(link);
     linkContainer.appendChild(icon);
 
-    this.node.parentNode?.appendChild(linkContainer);
+    this._node.parentNode?.appendChild(linkContainer);
   }
 
   private attachEventListeners(): void {
@@ -123,7 +155,7 @@ export class EnhancedDocumentLink {
       this.positionActionsContainer();
     });
 
-    this.node.addEventListener('mousedown', async (event) => {
+    this._node.addEventListener('mousedown', async (event) => {
       const isEnabled = await getSetting('clio_open_docs');
 
       if (isEnabled && this.linkType !== 'details') {

@@ -19,7 +19,7 @@ const SettingsContainer: React.FC<Props<any>> = ({
       control={control}
       name={controlName}
       render={({ field }) => (
-        <FormItem className="flex flex-row items-center justify-between rounded-lg border shadow-sm">
+        <FormItem className="flex flex-row items-center justify-between">
           <FormDescription className="text-sm text-foreground">
             {description}
           </FormDescription>
