@@ -14,6 +14,8 @@ export class DocumentLinkManager {
   public enhanceDocumentLinks(): void {
     const documentLinks = this.getDocumentLinks();
 
+    console.log('Links detected', documentLinks);
+
     documentLinks.forEach((documentLink) => {
       const enhancedLink = new EnhancedDocumentLink(documentLink);
       this.addActionsToEnhancedLink(enhancedLink, documentLink.node);
@@ -43,7 +45,7 @@ export class DocumentLinkManager {
 
     const documentDocLinks = Array.from(
       document.querySelectorAll(
-        'a[href*="/download"]'
+        'a[href*="/download"],a[ng-click*="handleDocumentClick"]'
       ) as NodeListOf<HTMLElement>
     )
       .filter((node) => !enhancedNodesSet.has(node))

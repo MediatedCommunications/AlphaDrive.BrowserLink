@@ -1,3 +1,5 @@
+import '@/assets/images/icon-0128-disabled.png';
+import '@/assets/images/icon-0128.png';
 import { SettingsSchemaType } from '@/schemas/settings.schema';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
