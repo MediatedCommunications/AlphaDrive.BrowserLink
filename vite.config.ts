@@ -9,13 +9,7 @@ const manifest = defineManifest({
   version: '25.01.05.1926',
   description:
     'Open documents straight from Clio, get free PACER looks, and much, much more.',
-  permissions: [
-    'storage',
-    'notifications',
-    'tabs',
-    'cookies',
-    'activeTab',
-  ],
+  permissions: ['storage', 'notifications', 'tabs', 'cookies', 'activeTab'],
   host_permissions: [
     '*://app.clio.com/*',
     '*://au.app.clio.com/*',
@@ -65,8 +59,15 @@ const manifest = defineManifest({
   ],
   web_accessible_resources: [
     {
-      resources: ['src/assets/*/*'],
-      matches: [],
+      resources: ['/src/assets/*', '/assets/*'],
+      matches: [
+        '*://*.uscourts.gov/*',
+        'https://app.clio.com/*',
+        'https://app.goclio.eu/*',
+        'https://*.app.clio.com/*',
+        'https://*.app.goclio.eu/*',
+        'https://www.courtlistener.com/*',
+      ],
     },
   ],
 });
