@@ -15,7 +15,6 @@ const manifest = defineManifest({
     'tabs',
     'cookies',
     'activeTab',
-    'declarativeNetRequest',
   ],
   host_permissions: [
     '*://app.clio.com/*',

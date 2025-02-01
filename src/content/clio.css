@@ -47,6 +47,7 @@
   position: relative;
   display: inline-block;
   width: 26px;
+  min-width:26px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;

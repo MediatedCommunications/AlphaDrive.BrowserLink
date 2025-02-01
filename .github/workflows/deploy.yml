@@ -43,20 +43,3 @@ jobs:
           client-id: ${{ secrets.CHROME_CLIENT_ID }}
           client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
           refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
-
-      - name: Deploy to Firefox Add-ons
-        uses: wdzeng/firefox-addon@v1
-        with:
-          addon-guid: your-addon's-guid
-          xpi-path: your-addon.zip
-          self-hosted: false
-          jwt-issuer: ${{ secrets.FIREFOX_JWT_ISSUER }}
-          jwt-secret: ${{ secrets.FIREFOX_JWT_SECRET }}
-
-      - name: Deploy to Edge Add-ons
-        uses: wdzeng/edge-addon@v2
-        with:
-          product-id: your-addon-product-id
-          zip-path: your-addon.zip
-          api-key: ${{ secrets.API_KEY }}
-          client-id: ${{ secrets.CLIENT_ID }}
