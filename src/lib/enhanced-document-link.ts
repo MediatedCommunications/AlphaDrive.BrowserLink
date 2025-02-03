@@ -124,7 +124,11 @@ export class EnhancedDocumentLink {
       attributeFilter: ['style'], // Only observe changes to the 'style' attribute
     };
 
-    const callback = (mutationsList, observer, linkContainerNode) => {
+    const callback = (
+      mutationsList: MutationRecord[],
+      _observer: MutationObserver,
+      linkContainerNode: HTMLElement
+    ) => {
       for (const mutation of mutationsList) {
         if (
           mutation.type === 'attributes' &&
@@ -168,7 +172,10 @@ export class EnhancedDocumentLink {
 
     this._node.parentNode?.appendChild(linkContainer);
 
-    const wrappedCallback = (mutationsList, observer) => {
+    const wrappedCallback = (
+      mutationsList: MutationRecord[],
+      observer: MutationObserver
+    ) => {
       callback(mutationsList, observer, linkContainer);
     };
 

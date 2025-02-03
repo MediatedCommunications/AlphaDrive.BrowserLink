@@ -10,7 +10,7 @@ export class DocumentLinkManager {
 
     documentLinks.forEach((documentLink) => {
       const enhancedLink = new EnhancedDocumentLink(documentLink);
-      this.addActionsToEnhancedLink(enhancedLink, documentLink.node);
+      this.addActionsToEnhancedLink(enhancedLink);
       this.enhancedNodes.push(documentLink.node);
       this.enhancedLinks.push(enhancedLink);
     });
@@ -169,10 +169,7 @@ export class DocumentLinkManager {
     });
   }
 
-  private addActionsToEnhancedLink(
-    enhancedLink: EnhancedDocumentLink,
-    node: HTMLElement
-  ): void {
+  private addActionsToEnhancedLink(enhancedLink: EnhancedDocumentLink): void {
     const actions: Action[] = [
       {
         name: 'Open with faster Suite',

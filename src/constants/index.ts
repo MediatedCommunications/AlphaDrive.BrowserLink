@@ -25,4 +25,4 @@ export const SINGLE_DOCUMENT_PAGE_REGEX =
 export const DOCUMENT_URL_REGEX =
   /https?:\/\/ecf\.([a-z]{2,3})\.uscourts\.gov\/doc1\/index\.pl\?.*caseid=[^&]+/;
 
-export const VERSION = '25.02.03.001';
+export const VERSION = '25.02.03.002';
