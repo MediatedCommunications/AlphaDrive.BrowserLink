@@ -9,13 +9,7 @@ const manifest = defineManifest({
   version: '25.01.05.1926',
   description:
     'Open documents straight from Clio, get free PACER looks, and much, much more.',
-  permissions: [
-    'storage',
-    'notifications',
-    'tabs',
-    'cookies',
-    'activeTab',
-  ],
+  permissions: ['storage', 'notifications', 'tabs', 'cookies', 'activeTab'],
   host_permissions: [
     '*://app.clio.com/*',
     '*://au.app.clio.com/*',
@@ -46,7 +40,7 @@ const manifest = defineManifest({
     {
       matches: ['*://*.uscourts.gov/*'],
       include_globs: ['*://ecf.*', '*://ecf-train.*', '*://pacer.*'],
-      css: ['src/assets/css/style.css', 'src/assets/css/font-awesome.min.css'],
+      css: ['assets/css/style.css', 'assets/css/font-awesome.min.css'],
       js: [
         'src/assets/js/jquery-3.2.1.js',
         'src/assets/js/FileSaver.js',
@@ -65,8 +59,15 @@ const manifest = defineManifest({
   ],
   web_accessible_resources: [
     {
-      resources: ['src/assets/*/*'],
-      matches: [],
+      resources: ['/assets/*'],
+      matches: [
+        '*://*.uscourts.gov/*',
+        'https://app.clio.com/*',
+        'https://app.goclio.eu/*',
+        'https://*.app.clio.com/*',
+        'https://*.app.goclio.eu/*',
+        'https://www.courtlistener.com/*',
+      ],
     },
   ],
 });
