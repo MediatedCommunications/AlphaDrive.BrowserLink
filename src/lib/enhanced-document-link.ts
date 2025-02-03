@@ -1,4 +1,3 @@
-import '@/assets/images/icon-0128.png';
 import { Action, DocumentLink, LinkType } from '@/types/clio';
 import { getSetting } from './settings';
 import { browserExtensionAPI } from './utils';
@@ -53,7 +52,7 @@ export class EnhancedDocumentLink {
     const fasterLawIcon = document.createElement('div');
     fasterLawIcon.classList.add('fasterlaw-icon', 'new-ui');
     fasterLawIcon.style.backgroundImage = `url(${browserExtensionAPI().runtime.getURL(
-      'src/assets/images/icon-0128.png'
+      '/assets/images/icon-0128.png'
     )})`;
     return fasterLawIcon;
   }
@@ -155,16 +154,52 @@ export class EnhancedDocumentLink {
       this.positionActionsContainer();
     });
 
-    this._node.addEventListener('mousedown', async (event) => {
-      const isEnabled = await getSetting('clio_open_docs');
+    this.node.addEventListener('mousedown', () => {
+      this.node.removeEventListener(
+        'click',
+        EnhancedDocumentLink.cancelClick,
+        true
+      );
 
-      if (isEnabled && this.linkType !== 'details') {
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-        window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${this.docID}`;
-      }
+      this.node.addEventListener(
+        'click',
+        EnhancedDocumentLink.cancelClick,
+        true
+      );
+
+      EnhancedDocumentLink.handleDocumentHandler(
+        this.linkType,
+        this.docID,
+        this.node
+      );
+
+      return false;
     });
+  }
+
+  public static cancelClick(e: MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+  }
+
+  public static async handleDocumentHandler(
+    linkType: LinkType,
+    docID: string,
+    node: HTMLElement
+  ) {
+    const isEnabled = await getSetting('clio_open_docs');
+
+    if (isEnabled && linkType !== 'details') {
+      window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
+    } else {
+      node.removeEventListener(
+        'click',
+        EnhancedDocumentLink.cancelClick,
+        true
+      );
+      node.click();
+    }
   }
 
   private toggleActionsContainer(): void {

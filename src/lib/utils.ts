@@ -1,5 +1,3 @@
-import '@/assets/images/icon-0128-disabled.png';
-import '@/assets/images/icon-0128.png';
 import { SettingsSchemaType } from '@/schemas/settings.schema';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -44,9 +42,7 @@ export async function updateAppIcon(
   if ((settings.clio_enhance_docs || settings.clio_open_docs) && isClioPage) {
     chrome.action.setIcon({
       tabId: activeTab.id,
-      path: browserExtensionAPI().runtime.getURL(
-        'src/assets/images/icon-0128.png'
-      ),
+      path: browserExtensionAPI().runtime.getURL('assets/images/icon-0128.png'),
     });
     chrome.action.setTitle({
       tabId: activeTab.id,
@@ -59,9 +55,7 @@ export async function updateAppIcon(
   ) {
     chrome.action.setIcon({
       tabId: activeTab.id,
-      path: browserExtensionAPI().runtime.getURL(
-        'src/assets/images/icon-0128.png'
-      ),
+      path: browserExtensionAPI().runtime.getURL('assets/images/icon-0128.png'),
     });
     chrome.action.setTitle({
       tabId: activeTab.id,
@@ -71,7 +65,7 @@ export async function updateAppIcon(
     chrome.action.setIcon({
       tabId: activeTab.id,
       path: browserExtensionAPI().runtime.getURL(
-        'src/assets/images/icon-0128-disabled.png'
+        'assets/images/icon-0128-disabled.png'
       ),
     });
     chrome.action.setTitle({

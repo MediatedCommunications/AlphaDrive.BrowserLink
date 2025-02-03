@@ -1,9 +1,3 @@
-import '@/assets/images/adjust-solid.svg';
-import '@/assets/images/download-solid.svg';
-import '@/assets/images/external-link-square-solid.svg';
-import '@/assets/images/folder-open-solid.svg';
-import '@/assets/images/icon-0016.png';
-import '@/assets/images/link-solid.svg';
 import { Action, DocumentLink, LinkType } from '@/types/clio';
 import { EnhancedDocumentLink } from './enhanced-document-link';
 
@@ -13,8 +7,6 @@ export class DocumentLinkManager {
 
   public enhanceDocumentLinks(): void {
     const documentLinks = this.getDocumentLinks();
-
-    console.log('Links detected', documentLinks);
 
     documentLinks.forEach((documentLink) => {
       const enhancedLink = new EnhancedDocumentLink(documentLink);
@@ -27,7 +19,7 @@ export class DocumentLinkManager {
   }
 
   public enableEnhancedLinks(): void {
-    console.log('Enhanced links toggled');
+    // console.log('Enhanced links toggled');
 
     this.enhancedLinks.forEach((link) => {
       link.setEnhance(true);
@@ -186,7 +178,7 @@ export class DocumentLinkManager {
         name: 'Open with faster Suite',
         title: 'Open this document with Faster Suite',
         iconClass: 'faster-suite',
-        iconUrl: 'src/assets/images/icon-0016.png',
+        iconUrl: 'assets/images/icon-0016.png',
         text: 'Open with Faster Suite',
         onClick: () => {
           window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${enhancedLink.docID}`;
@@ -196,7 +188,7 @@ export class DocumentLinkManager {
         name: 'Open with Clio Launcher',
         title: 'Open this document with Clio Launcher',
         iconClass: 'clio',
-        iconUrl: 'src/assets/images/external-link-square-solid.svg',
+        iconUrl: 'assets/images/external-link-square-solid.svg',
         text: 'Open with Clio Launcher',
         onClick: () => {
           const link = node
@@ -210,7 +202,7 @@ export class DocumentLinkManager {
         name: 'Download',
         title: 'Download this document',
         iconClass: 'download',
-        iconUrl: 'src/assets/images/download-solid.svg',
+        iconUrl: 'assets/images/download-solid.svg',
         text: 'Download',
         onClick: () => {
           window.open(
@@ -222,7 +214,7 @@ export class DocumentLinkManager {
         name: 'Locate',
         title: `Open this document's folder using Faster Suite`,
         iconClass: 'locate',
-        iconUrl: 'src/assets/images/folder-open-solid.svg',
+        iconUrl: 'assets/images/folder-open-solid.svg',
         text: 'Locate',
         onClick: () => {
           window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/locate?subject_url=/api/v4/documents/${enhancedLink.docID}`;
@@ -232,7 +224,7 @@ export class DocumentLinkManager {
         name: 'Copy Link',
         title: 'Copy a link to this document using Faster Suite',
         iconClass: 'link',
-        iconUrl: 'src/assets/images/link-solid.svg',
+        iconUrl: 'assets/images/link-solid.svg',
         text: 'Copy Link',
         onClick: () => {
           window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/share/link?subject_url=/api/v4/documents/${enhancedLink.docID}`;
@@ -242,7 +234,7 @@ export class DocumentLinkManager {
         name: 'Compare / History',
         title: 'Compare this document using Faster Suite',
         iconClass: 'compare',
-        iconUrl: 'src/assets/images/adjust-solid.svg',
+        iconUrl: 'assets/images/adjust-solid.svg',
         text: 'Compare / History',
         onClick: () => {
           window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/compare?subject_url=/api/v4/documents/${enhancedLink.docID}`;

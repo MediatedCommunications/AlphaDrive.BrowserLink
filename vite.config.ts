@@ -40,7 +40,7 @@ const manifest = defineManifest({
     {
       matches: ['*://*.uscourts.gov/*'],
       include_globs: ['*://ecf.*', '*://ecf-train.*', '*://pacer.*'],
-      css: ['src/assets/css/style.css', 'src/assets/css/font-awesome.min.css'],
+      css: ['assets/css/style.css', 'assets/css/font-awesome.min.css'],
       js: [
         'src/assets/js/jquery-3.2.1.js',
         'src/assets/js/FileSaver.js',
@@ -59,7 +59,7 @@ const manifest = defineManifest({
   ],
   web_accessible_resources: [
     {
-      resources: ['/src/assets/*', '/assets/*'],
+      resources: ['/assets/*'],
       matches: [
         '*://*.uscourts.gov/*',
         'https://app.clio.com/*',
