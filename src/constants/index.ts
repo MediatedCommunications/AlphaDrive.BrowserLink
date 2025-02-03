@@ -24,3 +24,5 @@ export const SINGLE_DOCUMENT_PAGE_REGEX =
 // Regular expression to identify PACER document URLs (more general)
 export const DOCUMENT_URL_REGEX =
   /https?:\/\/ecf\.([a-z]{2,3})\.uscourts\.gov\/doc1\/index\.pl\?.*caseid=[^&]+/;
+
+export const VERSION = '25.02.03.001';

@@ -191,11 +191,12 @@ export class DocumentLinkManager {
         iconUrl: 'assets/images/external-link-square-solid.svg',
         text: 'Open with Clio Launcher',
         onClick: () => {
-          const link = node
-            .closest('td')
-            ?.querySelector('a[ng-click*="Launcher" i]') as HTMLAnchorElement;
-
-          link?.click();
+          enhancedLink.bypassClick();
+          // const link = node
+          //   .closest('td')
+          //   ?.querySelector('a[ng-click*="Launcher" i]') as HTMLAnchorElement;
+          // console.log('Attmepting to click', link);
+          // link?.click();
         },
       },
       {

@@ -9,6 +9,7 @@ import { Form } from '../components/ui/form';
 import { Separator } from '../components/ui/separator';
 import { getSettings, saveSettings } from '../lib/settings';
 import { SettingsSchema, SettingsSchemaType } from '../schemas/settings.schema';
+import { VERSION } from '@/constants';
 
 const Popup: React.FC = () => {
   const form = useForm<SettingsSchemaType>({
@@ -99,7 +100,7 @@ const Popup: React.FC = () => {
 
       <Separator className="bg-slate-500" />
 
-      <p className="p-5 text-center ">
+      <p className="pt-5 px-5 text-center ">
         <a
           href="https://www.FasterLaw.com"
           target="_blank"
@@ -109,6 +110,8 @@ const Popup: React.FC = () => {
           www.FasterLaw.com
         </a>
       </p>
+
+      <p className="text-right text-xs pr-1 pb-1">v{VERSION}</p>
     </>
   );
 };
