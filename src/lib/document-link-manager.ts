@@ -10,7 +10,7 @@ export class DocumentLinkManager {
 
     documentLinks.forEach((documentLink) => {
       const enhancedLink = new EnhancedDocumentLink(documentLink);
-      this.addActionsToEnhancedLink(enhancedLink, documentLink.node);
+      this.addActionsToEnhancedLink(enhancedLink);
       this.enhancedNodes.push(documentLink.node);
       this.enhancedLinks.push(enhancedLink);
     });
@@ -169,10 +169,7 @@ export class DocumentLinkManager {
     });
   }
 
-  private addActionsToEnhancedLink(
-    enhancedLink: EnhancedDocumentLink,
-    node: HTMLElement
-  ): void {
+  private addActionsToEnhancedLink(enhancedLink: EnhancedDocumentLink): void {
     const actions: Action[] = [
       {
         name: 'Open with faster Suite',
@@ -191,11 +188,12 @@ export class DocumentLinkManager {
         iconUrl: 'assets/images/external-link-square-solid.svg',
         text: 'Open with Clio Launcher',
         onClick: () => {
-          const link = node
-            .closest('td')
-            ?.querySelector('a[ng-click*="Launcher" i]') as HTMLAnchorElement;
-
-          link?.click();
+          enhancedLink.bypassClick();
+          // const link = node
+          //   .closest('td')
+          //   ?.querySelector('a[ng-click*="Launcher" i]') as HTMLAnchorElement;
+          // console.log('Attmepting to click', link);
+          // link?.click();
         },
       },
       {

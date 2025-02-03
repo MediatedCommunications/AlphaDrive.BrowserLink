@@ -119,6 +119,30 @@ export class EnhancedDocumentLink {
   private addOpenWithFasterSuiteLink(): void {
     if (this.linkType !== 'details') return;
 
+    const config = {
+      attributes: true, // Observe attribute changes
+      attributeFilter: ['style'], // Only observe changes to the 'style' attribute
+    };
+
+    const callback = (
+      mutationsList: MutationRecord[],
+      _observer: MutationObserver,
+      linkContainerNode: HTMLElement
+    ) => {
+      for (const mutation of mutationsList) {
+        if (
+          mutation.type === 'attributes' &&
+          mutation.attributeName === 'style'
+        ) {
+          if (linkContainerNode) {
+            linkContainerNode.style.display = window.getComputedStyle(
+              this.node
+            ).display;
+          }
+        }
+      }
+    };
+
     const linkContainer = document.createElement('div');
     const link = document.createElement('a');
     const icon = document.createElement('i');
@@ -142,18 +166,46 @@ export class EnhancedDocumentLink {
       window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${this.docID}`;
     });
 
+    linkContainer.style.display = window.getComputedStyle(this.node).display;
     linkContainer.appendChild(link);
     linkContainer.appendChild(icon);
 
     this._node.parentNode?.appendChild(linkContainer);
+
+    const wrappedCallback = (
+      mutationsList: MutationRecord[],
+      observer: MutationObserver
+    ) => {
+      callback(mutationsList, observer, linkContainer);
+    };
+
+    // Create an observer instance linked to the wrapped callback function
+    const observer = new MutationObserver(wrappedCallback);
+
+    // Start observing the target element with the configured parameters
+    observer.observe(this.node, config);
+  }
+
+  public bypassClick(): void {
+    const link = this.node
+      .closest('td')
+      ?.querySelector('a[ng-click*="Launcher" i]') as HTMLAnchorElement;
+
+    if (link) {
+      console.log('Attmepting to click', link);
+      link.dataset.bypass = 'true';
+      link?.click();
+    }
   }
 
   private attachEventListeners(): void {
+    // Actions panel
     this.fasterLawIcon.addEventListener('click', () => {
       this.toggleActionsContainer();
       this.positionActionsContainer();
     });
 
+    // Link itself
     this.node.addEventListener('mousedown', () => {
       this.node.removeEventListener(
         'click',
@@ -175,12 +227,50 @@ export class EnhancedDocumentLink {
 
       return false;
     });
+
+    // Open launcher icon
+    const launcherIcon = this.node
+      .closest('td')
+      ?.querySelector('a[ng-click*="handleLauncherClick"]') as HTMLElement;
+
+    launcherIcon?.addEventListener('mousedown', () => {
+      console.log('In launcher icon click handler. Clicked:', this.node);
+
+      launcherIcon?.removeEventListener(
+        'click',
+        EnhancedDocumentLink.cancelClick,
+        true
+      );
+
+      launcherIcon.addEventListener(
+        'click',
+        EnhancedDocumentLink.cancelClick,
+        true
+      );
+
+      EnhancedDocumentLink.handleDocumentHandler(
+        this.linkType,
+        this.docID,
+        launcherIcon
+      );
+
+      return false;
+    });
   }
 
   public static cancelClick(e: MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
+    console.log(
+      'In the default cancel click',
+      e.target,
+      (e.target as HTMLElement)?.dataset.bypass
+    );
+    const bypass = (e.target as HTMLElement)?.dataset?.bypass;
+
+    if (!bypass) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    }
   }
 
   public static async handleDocumentHandler(
@@ -188,16 +278,15 @@ export class EnhancedDocumentLink {
     docID: string,
     node: HTMLElement
   ) {
+    console.log('In handle Document Handler');
     const isEnabled = await getSetting('clio_open_docs');
 
     if (isEnabled && linkType !== 'details') {
+      console.log('In handle Document Handler | Valid reroute');
       window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
     } else {
-      node.removeEventListener(
-        'click',
-        EnhancedDocumentLink.cancelClick,
-        true
-      );
+      console.log('In handle Document Handler | Invalid reroute');
+      node.removeEventListener('click', EnhancedDocumentLink.cancelClick, true);
       node.click();
     }
   }
