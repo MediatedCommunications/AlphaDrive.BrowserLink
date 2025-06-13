@@ -1,3 +1,9 @@
+/**
+ *  Clio Content Script
+ *  This script enhances the Clio web application by adding functionality
+ *  such as enhanced document links, toast notifications, and observing DOM changes.
+ *  It listens for changes in the local storage settings and updates the UI accordingly.
+ */
 import { DocumentLinkManager } from '@/lib/document-link-manager';
 import { ToastManager } from '@/lib/toast-manager';
 import './clio.css';
@@ -15,7 +21,7 @@ async function observerCallback(
   observer: MutationObserver
 ) {
   observer.disconnect();
-
+  //
   documentLinkManager.enhanceDocumentLinks();
 
   // Continue observing for future changes
