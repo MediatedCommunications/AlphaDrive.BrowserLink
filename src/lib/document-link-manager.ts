@@ -189,11 +189,6 @@ export class DocumentLinkManager {
         text: 'Open with Clio Launcher',
         onClick: () => {
           enhancedLink.bypassClick();
-          // const link = node
-          //   .closest('td')
-          //   ?.querySelector('a[ng-click*="Launcher" i]') as HTMLAnchorElement;
-          // console.log('Attmepting to click', link);
-          // link?.click();
         },
       },
       {
