@@ -1,10 +1,27 @@
 import { Action, DocumentLink, LinkType } from '@/types/clio';
 import { EnhancedDocumentLink } from './enhanced-document-link';
 
+/**
+ *  DocumentLinkManager is responsible for managing document links on the page.
+ *  It enhances document links by converting them into EnhancedDocumentLink instances,
+ *  adding actions, and binding click events.
+ *  It also ensures that links are not enhanced multiple times by checking against
+ *  already enhanced nodes.
+ */
 export class DocumentLinkManager {
   private enhancedNodes: HTMLElement[] = [];
   private enhancedLinks: EnhancedDocumentLink[] = [];
 
+  /**
+   *  Enhances document links on the page by converting them into
+   *  EnhancedDocumentLink instances, adding actions, and binding click events.
+   *  It also ensures that links are not enhanced multiple times by checking
+   *  against already enhanced nodes.
+   *  This method collects all relevant document links from the page,
+   *  enhances them, and sets up the necessary event listeners for interaction.
+   *  It also binds a click event to close the actions container when clicking outside of it.
+   *  This method should be called when the page is ready to ensure all links are processed.
+   */
   public enhanceDocumentLinks(): void {
     const documentLinks = this.getDocumentLinks();
 
@@ -19,8 +36,6 @@ export class DocumentLinkManager {
   }
 
   public enableEnhancedLinks(): void {
-    // console.log('Enhanced links toggled');
-
     this.enhancedLinks.forEach((link) => {
       link.setEnhance(true);
     });
@@ -32,9 +47,16 @@ export class DocumentLinkManager {
     });
   }
 
+  /**
+   *  Adds actions to the enhanced document link.
+   *  This method creates a set of actions that can be performed on the document link,
+   *  such as opening in a new tab, copying the link, or downloading the document.
+   *  It also binds click events to these actions to perform the corresponding operations.
+   */
   private getDocumentLinks(): DocumentLink[] {
     const enhancedNodesSet = new Set(this.enhancedNodes);
 
+    // Collect all document links from the page, filtering out already enhanced nodes
     const documentDocLinks = Array.from(
       document.querySelectorAll(
         'a[href*="/download"],a[ng-click*="handleDocumentClick"]'
@@ -43,6 +65,7 @@ export class DocumentLinkManager {
       .filter((node) => !enhancedNodesSet.has(node))
       .map((node) => this.toDocumentLink(node, 'documents'));
 
+    // Collect links from search results
     const searchDocLinks = Array.from(
       document.querySelectorAll(
         'a[href*="/details"]'
@@ -51,6 +74,7 @@ export class DocumentLinkManager {
       .filter((node) => !enhancedNodesSet.has(node))
       .map((node) => this.toDocumentLink(node, 'search-results'));
 
+    // Collect links from external documents and details pages
     const externalDocLinks = Array.from(
       document.querySelectorAll(
         `a[href*="/external_documents"`
@@ -59,6 +83,9 @@ export class DocumentLinkManager {
       .filter((node) => !enhancedNodesSet.has(node))
       .map((node) => this.toDocumentLink(node, 'external'));
 
+    // Collect links from details pages with x-on:click attribute
+    // This is for links that are enhanced by Clio's JavaScript
+    // and are not already enhanced by our script
     const detailsDocLinks = Array.from(
       document.querySelectorAll('a.clio-ui-link') as NodeListOf<HTMLElement>
     )
@@ -74,6 +101,11 @@ export class DocumentLinkManager {
     ];
   }
 
+  /**
+   *  Converts a given HTML element into a DocumentLink object.
+   *  This method extracts the document ID from the element based on its link type
+   *  and returns a DocumentLink object containing the node, document ID, and link type.
+   */
   private toDocumentLink(node: HTMLElement, linkType: LinkType): DocumentLink {
     return {
       node,
@@ -82,6 +114,13 @@ export class DocumentLinkManager {
     };
   }
 
+  /**
+   *  Extracts the document ID from the given node based on the link type.
+   *  It uses regular expressions to match the document ID in the href attribute
+   *  or in the x-on:click attribute for details links.
+   *  If no ID is found, it attempts to extract it from the ui-sref attribute
+   *  or from a span element's id attribute.
+   */
   private extractDocumentId(node: HTMLElement, linkType: LinkType): string {
     let docId;
 
@@ -149,6 +188,12 @@ export class DocumentLinkManager {
     return docId;
   }
 
+  /**
+   *  Binds a click event to the document to close the actions container
+   *  when clicking outside of it. This ensures that the actions container
+   *  is closed when the user clicks anywhere outside of the actions container
+   *  or the icon that opens it.
+   */
   private clickOutsideEventBinding(): void {
     document.addEventListener('click', (event) => {
       if (
@@ -169,6 +214,13 @@ export class DocumentLinkManager {
     });
   }
 
+  /**
+   *  Adds predefined actions to the EnhancedDocumentLink instance.
+   *  These actions include opening the document with Faster Suite,
+   *  opening with Clio Launcher, downloading the document, locating
+   *  the document's folder, copying the link, and comparing the document.
+   *  Each action is defined with its name, title, icon, and click handler.
+   */
   private addActionsToEnhancedLink(enhancedLink: EnhancedDocumentLink): void {
     const actions: Action[] = [
       {
