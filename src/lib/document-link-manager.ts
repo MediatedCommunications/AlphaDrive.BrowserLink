@@ -175,10 +175,6 @@ export class DocumentLinkManager {
       }
     }
 
-    console.log(
-      `Extracted document ID from node: ${node}, linkType: ${linkType}, docId: ${docId}`
-    );
-
     if (!docId) {
       const docIdRegEx = /{\s?id:\s?(\d+)\s?}/gm;
       const docIdAttr = node.getAttribute('ui-sref') || '';
