@@ -21,7 +21,7 @@ async function observerCallback(
   observer: MutationObserver
 ) {
   observer.disconnect();
-  //
+
   documentLinkManager.enhanceDocumentLinks();
 
   // Continue observing for future changes

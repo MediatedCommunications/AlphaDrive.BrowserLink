@@ -2,40 +2,59 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 
-// Path to your package.json, manifest.json, and src/constants/index.ts
+// File paths
 const packagePath = path.join(__dirname, 'package.json');
 const manifestPath = path.join(__dirname, 'dist', 'manifest.json');
 const constantsPath = path.join(__dirname, 'src', 'constants', 'index.ts');
 
-// Read the VERSION constant from src/constants/index.ts
-const constantsData = fs.readFileSync(constantsPath, 'utf8');
-const versionMatch = constantsData.match(/export const VERSION = '([^']+)';/);
-if (!versionMatch) {
-  throw new Error('VERSION constant not found in src/constants/index.ts');
+// Helper to zero-fill numbers
+const zeroFill = (num, width) => String(num).padStart(width, '0');
+
+// Get today’s date parts
+const now = new Date();
+const fullYear = now.getFullYear(); // e.g. 2025
+const yearShort = String(fullYear).slice(2); // e.g. 25
+const month = zeroFill(now.getMonth() + 1, 2);
+const day = zeroFill(now.getDate(), 2);
+
+// Get current version from package.json
+const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+const [oldYear, oldMonth, oldDay, oldBuild] = pkg.version.split('.');
+
+// Determine new version
+let buildNumber;
+if (oldYear === yearShort && oldMonth === month && oldDay === day) {
+  // Same day – increment build
+  buildNumber = zeroFill(Number(oldBuild) + 1, 3);
+} else {
+  // New day – reset build
+  buildNumber = '001';
 }
-const version = versionMatch[1];
 
-// Read the current version from package.json
-const packageData = fs.readFileSync(packagePath);
-const pkg = JSON.parse(packageData);
+// Compose new versions
+const newPackageVersion = `${yearShort}.${month}.${day}.${buildNumber}`; // For package.json and manifest.json
+const newConstantVersion = `${fullYear}.${month}.${day}.${buildNumber}`; // For index.ts
+const zipVersion = `v${fullYear}_${month}_${day}_${buildNumber}`; // For zip file
 
-// Update the version in package.json
-pkg.version = version;
-fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2)); // Write updated package.json back to disk
+// Update package.json
+pkg.version = newPackageVersion;
+fs.writeFileSync(packagePath, JSON.stringify(pkg, null, 2), 'utf8');
 
-// Read the current version from the manifest
-const data = fs.readFileSync(manifestPath);
-const manifest = JSON.parse(data);
+// Update manifest.json
+const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+manifest.version = newPackageVersion;
+fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
 
-// Update the version in manifest.json
-manifest.version = version;
-fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2)); // Write updated manifest back to disk
+// Update src/constants/index.ts VERSION export
+let constantsContent = fs.readFileSync(constantsPath, 'utf8');
+constantsContent = constantsContent.replace(
+  /export const VERSION = '[^']+';/,
+  `export const VERSION = '${newConstantVersion}';`
+);
+fs.writeFileSync(constantsPath, constantsContent, 'utf8');
 
-// Extract the date components from the version for the zip file name
-const [yearShort, month, day, patchNumber] = version.split('.');
-
-// Zip the contents of dist folder with a specific name format including the full year in the filename
-const zipFileName = `faster_law_browser_extension_v${yearShort}_${month}_${day}_${patchNumber}.zip`;
+// Create zip file
+const zipFileName = `faster_law_browser_extension_${zipVersion}.zip`;
 
 exec(
   `cd dist && zip -r ../output/${zipFileName} ./*`,
@@ -48,7 +67,7 @@ exec(
     if (stderr) {
       console.error(stderr);
     } else {
-      console.log(`Zip file created: ${zipFileName}`);
+      console.log(`✅ Zip file created: ${zipFileName}`);
     }
   }
 );

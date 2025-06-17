@@ -32,6 +32,8 @@ export class DocumentLinkManager {
       this.enhancedLinks.push(enhancedLink);
     });
 
+    // console.log(documentLinks);
+
     this.clickOutsideEventBinding();
   }
 
@@ -122,7 +124,7 @@ export class DocumentLinkManager {
    *  or from a span element's id attribute.
    */
   private extractDocumentId(node: HTMLElement, linkType: LinkType): string {
-    let docId;
+    let docId = null;
 
     switch (linkType) {
       case 'documents': {
@@ -173,6 +175,10 @@ export class DocumentLinkManager {
       }
     }
 
+    console.log(
+      `Extracted document ID from node: ${node}, linkType: ${linkType}, docId: ${docId}`
+    );
+
     if (!docId) {
       const docIdRegEx = /{\s?id:\s?(\d+)\s?}/gm;
       const docIdAttr = node.getAttribute('ui-sref') || '';
@@ -181,7 +187,20 @@ export class DocumentLinkManager {
       if (docIdMatch) {
         docId = docIdMatch[1];
       } else {
-        return node.closest('span')?.getAttribute('id') || 'id not found';
+        let current: HTMLElement | null = node.parentElement;
+        let attempts = 0;
+
+        // Traverse up the DOM tree to find a span element with an id attribute
+        while (current && attempts < 3) {
+          if (current.tagName.toLowerCase() === 'span') {
+            const id = current.getAttribute('id');
+            if (id) return id;
+            attempts++;
+          }
+          current = current.parentElement;
+        }
+
+        return 'id not found';
       }
     }
 
