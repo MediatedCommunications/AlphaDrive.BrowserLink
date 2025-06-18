@@ -50,15 +50,18 @@ export class EnhancedDocumentLink {
 
   private createFasterLawIcon(): HTMLDivElement {
     const fasterLawIcon = document.createElement('div');
+
     fasterLawIcon.classList.add('fasterlaw-icon', 'new-ui');
     fasterLawIcon.style.backgroundImage = `url(${browserExtensionAPI().runtime.getURL(
       '/assets/images/icon-0128.png'
     )})`;
+
     return fasterLawIcon;
   }
 
   private createActionsContainer(): HTMLDivElement {
     const actionsContainer = document.createElement('div');
+
     actionsContainer.classList.add('fasterlaw-actions-container', 'new-ui');
     document.body.appendChild(actionsContainer);
 
@@ -192,7 +195,6 @@ export class EnhancedDocumentLink {
       ?.querySelector('a[ng-click*="Launcher" i]') as HTMLAnchorElement;
 
     if (link) {
-      console.log('Attmepting to click', link);
       link.dataset.bypass = 'true';
       link?.click();
     }
@@ -205,7 +207,7 @@ export class EnhancedDocumentLink {
       this.positionActionsContainer();
     });
 
-    // Link itself
+    // Link
     this.node.addEventListener('mousedown', () => {
       this.node.removeEventListener(
         'click',
@@ -234,7 +236,7 @@ export class EnhancedDocumentLink {
       ?.querySelector('a[ng-click*="handleLauncherClick"]') as HTMLElement;
 
     launcherIcon?.addEventListener('mousedown', () => {
-      console.log('In launcher icon click handler. Clicked:', this.node);
+      // console.log('In launcher icon click handler. Clicked:', this.node);
 
       launcherIcon?.removeEventListener(
         'click',
@@ -259,11 +261,6 @@ export class EnhancedDocumentLink {
   }
 
   public static cancelClick(e: MouseEvent) {
-    console.log(
-      'In the default cancel click',
-      e.target,
-      (e.target as HTMLElement)?.dataset.bypass
-    );
     const bypass = (e.target as HTMLElement)?.dataset?.bypass;
 
     if (!bypass) {
@@ -278,14 +275,11 @@ export class EnhancedDocumentLink {
     docID: string,
     node: HTMLElement
   ) {
-    console.log('In handle Document Handler');
     const isEnabled = await getSetting('clio_open_docs');
 
     if (isEnabled && linkType !== 'details') {
-      console.log('In handle Document Handler | Valid reroute');
       window.location.href = `alphadrive://localhost/Remoting/custom_actions/documents/edit?subject_url=/api/v4/documents/${docID}`;
     } else {
-      console.log('In handle Document Handler | Invalid reroute');
       node.removeEventListener('click', EnhancedDocumentLink.cancelClick, true);
       node.click();
     }

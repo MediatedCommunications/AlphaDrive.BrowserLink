@@ -1,7 +1,7 @@
 {
   "name": "faster-suit-ext",
   "private": true,
-  "version": "25.02.03.006",
+  "version": "25.06.18.003",
   "type": "module",
   "license": "MIT",
   "scripts": {
@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "update-version-and-zip": "node updateVersionAndZip.cjs"
+    "deploy": "node updateVersionAndZip.cjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
