@@ -32,7 +32,7 @@ export class DocumentLinkManager {
       this.enhancedLinks.push(enhancedLink);
     });
 
-    // console.log(documentLinks);
+    console.log(documentLinks);
 
     this.clickOutsideEventBinding();
   }
@@ -65,6 +65,7 @@ export class DocumentLinkManager {
       ) as NodeListOf<HTMLElement>
     )
       .filter((node) => !enhancedNodesSet.has(node))
+      .filter((node) => !this.isClioMenuDownload(node))
       .map((node) => this.toDocumentLink(node, 'documents'));
 
     // Collect links from search results
@@ -302,5 +303,17 @@ export class DocumentLinkManager {
       },
     ];
     enhancedLink.addActions(actions);
+  }
+
+  private isClioMenuDownload(el: HTMLElement): boolean {
+    const insideDropdown = !!el.closest('.clio-ui-menu[role="menu"]');
+    const isMenuItem = el.getAttribute('role') === 'menuitem';
+
+    // direct-child check
+    const hasDownloadLabel = Array.from(el.children).some(
+      (child) => child.textContent?.trim().toLowerCase() === 'download'
+    );
+
+    return insideDropdown && isMenuItem && hasDownloadLabel;
   }
 }
