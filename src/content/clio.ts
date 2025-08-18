@@ -59,3 +59,30 @@ window.addEventListener('message', (message) => {
 function sendMessageToTop(detail: any): void {
   window.parent.postMessage(detail, '*');
 }
+
+console.log('Clio content script loaded');
+const mark = () => document.body.classList.add('auto-print');
+
+// Check the inline onload attribute text
+const hasAutoPrintAttr = () => {
+  const attr = document.body.getAttribute('onload') || '';
+  console.log('onload attribute:', attr);
+  // matches: window.print(), print(), with optional spaces
+  return /(?:^|[^\w$])(window\.)?print\s*\(/.test(attr);
+};
+
+if (hasAutoPrintAttr()) mark();
+
+// If something sets/changes the onload attribute later, catch that too
+new MutationObserver((muts) => {
+  for (const m of muts) {
+    if (
+      m.type === 'attributes' &&
+      m.attributeName === 'onload' &&
+      hasAutoPrintAttr()
+    ) {
+      mark();
+      break;
+    }
+  }
+}).observe(document.body, { attributes: true, attributeFilter: ['onload'] });

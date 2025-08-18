@@ -11,6 +11,28 @@
   font-size: 11px;
 }
 
+@media print {
+  #momane_toast,
+  .momane_toast-container {
+    position: static; /* avoid fixed positioning in print */
+    width: auto; /* let it flow with the page */
+    box-shadow: none; /* remove shadows for clean print */
+    background-color: transparent; /* lighter background */
+    border: none; /* optional: remove border */
+    font-size: 12px; /* slightly larger for readability */
+  }
+}
+
+body.auto-print #momane_toast,
+body.auto-print .momane_toast-container {
+  position: static; /* avoid fixed positioning in print */
+  width: auto; /* let it flow with the page */
+  box-shadow: none; /* remove shadows for clean print */
+  background-color: transparent; /* lighter background */
+  border: none; /* optional: remove border */
+  font-size: 12px; /* slightly larger for readability */
+}
+
 .momane_search,
 .momane_compare,
 .momane_download,
@@ -47,7 +69,7 @@
   position: relative;
   display: inline-block;
   width: 26px;
-  min-width:26px;
+  min-width: 26px;
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
