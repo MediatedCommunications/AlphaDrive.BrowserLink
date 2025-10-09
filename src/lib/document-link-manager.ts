@@ -71,7 +71,8 @@ export class DocumentLinkManager {
     // Collect links from search results
     const searchDocLinks = Array.from(
       document.querySelectorAll(
-        'a[href*="/details"]'
+        // Exclude main document links that already have a Clio click handler
+        'a[href*="/details"]:not([ng-click*="handleDocumentClick"])'
       ) as NodeListOf<HTMLElement>
     )
       .filter((node) => !enhancedNodesSet.has(node))
@@ -96,12 +97,21 @@ export class DocumentLinkManager {
       .filter((node) => !enhancedNodesSet.has(node))
       .map((node) => this.toDocumentLink(node, 'details'));
 
-    return [
+    // Merge and de-duplicate by DOM node to avoid enhancing the same link twice
+    const combined = [
       ...documentDocLinks,
       ...searchDocLinks,
       ...externalDocLinks,
       ...detailsDocLinks,
     ];
+    const seen = new Set<HTMLElement>();
+    const unique = combined.filter((dl) => {
+      if (seen.has(dl.node)) return false;
+      seen.add(dl.node);
+      return true;
+    });
+
+    return unique;
   }
 
   /**

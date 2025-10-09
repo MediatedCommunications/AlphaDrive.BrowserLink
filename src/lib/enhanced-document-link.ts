@@ -115,7 +115,16 @@ export class EnhancedDocumentLink {
       const enhance = await getSetting('clio_enhance_docs');
       this.setEnhance(enhance ?? false);
 
-      targetViewElement.append(this.fasterLawIcon);
+      // Prevent duplicate icon injection if one already exists in the host cell
+      const existingIcon = targetViewElement.querySelector(
+        '.fasterlaw-icon.new-ui'
+      ) as HTMLDivElement | null;
+      if (!existingIcon) {
+        targetViewElement.append(this.fasterLawIcon);
+      } else {
+        // Reuse the existing icon to avoid duplicates
+        this.fasterLawIcon = existingIcon;
+      }
     }
   }
 
