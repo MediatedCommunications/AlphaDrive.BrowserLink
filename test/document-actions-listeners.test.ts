@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { bindDocumentActionsDismissal } from '../src/lib/document-actions-listeners.ts';
+import { pruneDisconnectedDocumentLinks } from '../src/lib/managed-document-links.ts';
 
 test('binds document-action dismissal listeners only once per document', () => {
   const registrations = { click: 0, wheel: 0 };
@@ -51,4 +52,29 @@ test('binds listeners for a newly loaded document', () => {
   bindDocumentActionsDismissal(secondDocument, targetWindow);
 
   assert.equal(clickRegistrations, 2);
+});
+
+test('destroys and releases document links after Clio detaches them', () => {
+  const destroyed: string[] = [];
+  const links = [
+    {
+      id: 'connected',
+      node: { isConnected: true } as Node,
+      destroy() {
+        destroyed.push(this.id);
+      },
+    },
+    {
+      id: 'detached',
+      node: { isConnected: false } as Node,
+      destroy() {
+        destroyed.push(this.id);
+      },
+    },
+  ];
+
+  const retained = pruneDisconnectedDocumentLinks(links);
+
+  assert.deepEqual(retained.map((link) => link.id), ['connected']);
+  assert.deepEqual(destroyed, ['detached']);
 });

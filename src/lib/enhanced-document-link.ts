@@ -10,6 +10,63 @@ export class EnhancedDocumentLink {
   private actionsContainer: HTMLDivElement;
   private enhanced = false;
   private downloadsEnabled = false;
+  private detailsObserver?: MutationObserver;
+  private detailsLinkContainer?: HTMLDivElement;
+  private detailsLinkHost?: HTMLElement;
+  private iconHost?: HTMLElement;
+  private iconHostLastButton?: HTMLElement;
+  private iconHostLastButtonTopRadius = '';
+  private iconHostLastButtonBottomRadius = '';
+  private ownsFasterLawIcon = false;
+  private launcherIcon?: HTMLElement;
+  private destroyed = false;
+
+  private readonly fasterLawIconClickHandler = () => {
+    this.toggleActionsContainer();
+    this.positionActionsContainer();
+  };
+
+  private readonly nodeMouseDownHandler = () => {
+    this.node.removeEventListener(
+      'click',
+      EnhancedDocumentLink.cancelClick,
+      true
+    );
+
+    this.node.addEventListener(
+      'click',
+      EnhancedDocumentLink.cancelClick,
+      true
+    );
+
+    EnhancedDocumentLink.handleDocumentHandler(
+      this.linkType,
+      this.docID,
+      this.node
+    );
+  };
+
+  private readonly launcherMouseDownHandler = () => {
+    if (!this.launcherIcon) return;
+
+    this.launcherIcon.removeEventListener(
+      'click',
+      EnhancedDocumentLink.cancelClick,
+      true
+    );
+
+    this.launcherIcon.addEventListener(
+      'click',
+      EnhancedDocumentLink.cancelClick,
+      true
+    );
+
+    EnhancedDocumentLink.handleDocumentHandler(
+      this.linkType,
+      this.docID,
+      this.launcherIcon
+    );
+  };
 
   public get node(): HTMLElement {
     return this._node;
@@ -100,6 +157,23 @@ export class EnhancedDocumentLink {
       ?.parentNode as HTMLElement;
 
     if (targetViewElement) {
+      const enhance = await getSetting('clio_enhance_docs');
+      if (this.destroyed || !targetViewElement.isConnected) return;
+
+      // Prevent duplicate icon injection if one already exists in the host cell.
+      const existingIcon = targetViewElement.querySelector(
+        '.fasterlaw-icon.new-ui'
+      ) as HTMLDivElement | null;
+      if (existingIcon) {
+        this.fasterLawIcon.removeEventListener(
+          'click',
+          this.fasterLawIconClickHandler
+        );
+        this.fasterLawIcon = existingIcon;
+        return;
+      }
+
+      this.iconHost = targetViewElement;
       targetViewElement.classList.add('fasterlaw-icon-host');
 
       // Style existing elements
@@ -108,23 +182,18 @@ export class EnhancedDocumentLink {
       ) as HTMLElement;
 
       if (lastBtn) {
+        this.iconHostLastButton = lastBtn;
+        this.iconHostLastButtonTopRadius =
+          lastBtn.style.borderTopRightRadius;
+        this.iconHostLastButtonBottomRadius =
+          lastBtn.style.borderBottomRightRadius;
         lastBtn.style.borderTopRightRadius = '0';
         lastBtn.style.borderBottomRightRadius = '0';
       }
 
-      const enhance = await getSetting('clio_enhance_docs');
       this.setEnhance(enhance ?? false);
-
-      // Prevent duplicate icon injection if one already exists in the host cell
-      const existingIcon = targetViewElement.querySelector(
-        '.fasterlaw-icon.new-ui'
-      ) as HTMLDivElement | null;
-      if (!existingIcon) {
-        targetViewElement.append(this.fasterLawIcon);
-      } else {
-        // Reuse the existing icon to avoid duplicates
-        this.fasterLawIcon = existingIcon;
-      }
+      targetViewElement.append(this.fasterLawIcon);
+      this.ownsFasterLawIcon = true;
     }
   }
 
@@ -161,6 +230,7 @@ export class EnhancedDocumentLink {
     const parentNode = this._node.parentNode as HTMLElement;
 
     parentNode.classList.add('fasterlaw-details-open-link-host');
+    this.detailsLinkHost = parentNode;
 
     icon.setAttribute('aria-hidden', 'true');
     icon.setAttribute('role', 'img');
@@ -183,6 +253,7 @@ export class EnhancedDocumentLink {
     linkContainer.appendChild(icon);
 
     this._node.parentNode?.appendChild(linkContainer);
+    this.detailsLinkContainer = linkContainer;
 
     const wrappedCallback = (
       mutationsList: MutationRecord[],
@@ -193,9 +264,52 @@ export class EnhancedDocumentLink {
 
     // Create an observer instance linked to the wrapped callback function
     const observer = new MutationObserver(wrappedCallback);
+    this.detailsObserver = observer;
 
     // Start observing the target element with the configured parameters
     observer.observe(this.node, config);
+  }
+
+  public destroy(): void {
+    if (this.destroyed) return;
+    this.destroyed = true;
+
+    this.detailsObserver?.disconnect();
+    this.fasterLawIcon.removeEventListener(
+      'click',
+      this.fasterLawIconClickHandler
+    );
+    this.node.removeEventListener('mousedown', this.nodeMouseDownHandler);
+    this.node.removeEventListener(
+      'click',
+      EnhancedDocumentLink.cancelClick,
+      true
+    );
+    this.launcherIcon?.removeEventListener(
+      'mousedown',
+      this.launcherMouseDownHandler
+    );
+    this.launcherIcon?.removeEventListener(
+      'click',
+      EnhancedDocumentLink.cancelClick,
+      true
+    );
+    this.detailsLinkContainer?.remove();
+    this.actionsContainer.remove();
+    this.detailsLinkHost?.classList.remove(
+      'fasterlaw-details-open-link-host'
+    );
+
+    if (this.ownsFasterLawIcon) {
+      this.fasterLawIcon.remove();
+      this.iconHost?.classList.remove('fasterlaw-icon-host');
+      if (this.iconHostLastButton) {
+        this.iconHostLastButton.style.borderTopRightRadius =
+          this.iconHostLastButtonTopRadius;
+        this.iconHostLastButton.style.borderBottomRightRadius =
+          this.iconHostLastButtonBottomRadius;
+      }
+    }
   }
 
   public bypassClick(): void {
@@ -211,62 +325,23 @@ export class EnhancedDocumentLink {
 
   private attachEventListeners(): void {
     // Actions panel
-    this.fasterLawIcon.addEventListener('click', () => {
-      this.toggleActionsContainer();
-      this.positionActionsContainer();
-    });
+    this.fasterLawIcon.addEventListener(
+      'click',
+      this.fasterLawIconClickHandler
+    );
 
     // Link
-    this.node.addEventListener('mousedown', () => {
-      this.node.removeEventListener(
-        'click',
-        EnhancedDocumentLink.cancelClick,
-        true
-      );
-
-      this.node.addEventListener(
-        'click',
-        EnhancedDocumentLink.cancelClick,
-        true
-      );
-
-      EnhancedDocumentLink.handleDocumentHandler(
-        this.linkType,
-        this.docID,
-        this.node
-      );
-
-      return false;
-    });
+    this.node.addEventListener('mousedown', this.nodeMouseDownHandler);
 
     // Open launcher icon
-    const launcherIcon = this.node
+    this.launcherIcon = this.node
       .closest('td')
       ?.querySelector('a[ng-click*="handleLauncherClick"]') as HTMLElement;
 
-    launcherIcon?.addEventListener('mousedown', () => {
-      // console.log('In launcher icon click handler. Clicked:', this.node);
-
-      launcherIcon?.removeEventListener(
-        'click',
-        EnhancedDocumentLink.cancelClick,
-        true
-      );
-
-      launcherIcon.addEventListener(
-        'click',
-        EnhancedDocumentLink.cancelClick,
-        true
-      );
-
-      EnhancedDocumentLink.handleDocumentHandler(
-        this.linkType,
-        this.docID,
-        launcherIcon
-      );
-
-      return false;
-    });
+    this.launcherIcon?.addEventListener(
+      'mousedown',
+      this.launcherMouseDownHandler
+    );
   }
 
   public static cancelClick(e: MouseEvent) {
