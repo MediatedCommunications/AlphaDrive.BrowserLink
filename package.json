@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test": "node --test src/lib/toast-manager.test.ts",
     "preview": "vite preview",
     "deploy": "node updateVersionAndZip.cjs"
   },
