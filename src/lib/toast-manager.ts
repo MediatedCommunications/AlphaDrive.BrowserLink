@@ -1,13 +1,19 @@
 export class ToastManager {
-  private toast: HTMLDivElement;
-
-  constructor() {
-    this.toast = document.createElement('div');
-    this.toast.setAttribute('id', 'momane_toast');
-    document.body.appendChild(this.toast);
-  }
+  private toast: HTMLDivElement | null = null;
 
   public showToast(text: string): void {
-    console.log('Showing toast:', text);
+    const message = text.trim();
+
+    if (!message) return;
+
+    if (!this.toast) {
+      this.toast = document.createElement('div');
+      this.toast.setAttribute('id', 'momane_toast');
+      this.toast.setAttribute('role', 'status');
+      this.toast.style.pointerEvents = 'none';
+      document.body.appendChild(this.toast);
+    }
+
+    this.toast.textContent = message;
   }
 }
