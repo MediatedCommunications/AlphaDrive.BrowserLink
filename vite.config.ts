@@ -1,12 +1,17 @@
 import { crx, defineManifest } from '@crxjs/vite-plugin';
 import react from '@vitejs/plugin-react-swc';
+import fs from 'node:fs';
 import path from 'path';
 import { defineConfig } from 'vite';
+
+const packageJson = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, 'package.json'), 'utf8')
+) as { version: string };
 
 const manifest = defineManifest({
   manifest_version: 3,
   name: 'Faster Suite Browser Link',
-  version: '25.01.05.1926',
+  version: packageJson.version,
   description:
     'Open documents straight from Clio, get free PACER looks, and much, much more.',
   permissions: ['storage', 'notifications', 'tabs', 'cookies', 'activeTab'],

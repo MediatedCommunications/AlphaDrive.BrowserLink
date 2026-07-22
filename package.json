@@ -1,7 +1,7 @@
 {
   "name": "faster-suit-ext",
   "private": true,
-  "version": "25.10.09.001",
+  "version": "26.7.22.1",
   "type": "module",
   "license": "MIT",
   "scripts": {
@@ -9,7 +9,7 @@
     "build": "tsc -b && vite build",
     "check": "npm test && npm run lint && npm run build",
     "lint": "eslint .",
-    "test": "node --test src/lib/toast-manager.test.ts test/document-actions-listeners.test.ts",
+    "test": "node --test src/lib/toast-manager.test.ts test/document-actions-listeners.test.ts test/release-packaging.test.cjs",
     "preview": "vite preview",
     "deploy": "node updateVersionAndZip.cjs"
   },
