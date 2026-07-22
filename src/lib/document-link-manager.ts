@@ -1,5 +1,7 @@
 import { Action, DocumentLink, LinkType } from '@/types/clio';
+import { bindDocumentActionsDismissal } from './document-actions-listeners';
 import { EnhancedDocumentLink } from './enhanced-document-link';
+import { pruneDisconnectedDocumentLinks } from './managed-document-links';
 
 /**
  *  DocumentLinkManager is responsible for managing document links on the page.
@@ -9,7 +11,6 @@ import { EnhancedDocumentLink } from './enhanced-document-link';
  *  already enhanced nodes.
  */
 export class DocumentLinkManager {
-  private enhancedNodes: HTMLElement[] = [];
   private enhancedLinks: EnhancedDocumentLink[] = [];
 
   /**
@@ -23,27 +24,29 @@ export class DocumentLinkManager {
    *  This method should be called when the page is ready to ensure all links are processed.
    */
   public enhanceDocumentLinks(): void {
+    this.pruneDetachedLinks();
     const documentLinks = this.getDocumentLinks();
 
     documentLinks.forEach((documentLink) => {
       const enhancedLink = new EnhancedDocumentLink(documentLink);
       this.addActionsToEnhancedLink(enhancedLink);
-      this.enhancedNodes.push(documentLink.node);
       this.enhancedLinks.push(enhancedLink);
     });
 
     console.log(documentLinks);
 
-    this.clickOutsideEventBinding();
+    bindDocumentActionsDismissal(document, window);
   }
 
   public enableEnhancedLinks(): void {
+    this.pruneDetachedLinks();
     this.enhancedLinks.forEach((link) => {
       link.setEnhance(true);
     });
   }
 
   public disableEnhancedLinks(): void {
+    this.pruneDetachedLinks();
     this.enhancedLinks.forEach((link) => {
       link.setEnhance(false);
     });
@@ -56,7 +59,9 @@ export class DocumentLinkManager {
    *  It also binds click events to these actions to perform the corresponding operations.
    */
   private getDocumentLinks(): DocumentLink[] {
-    const enhancedNodesSet = new Set(this.enhancedNodes);
+    const enhancedNodesSet = new Set(
+      this.enhancedLinks.map((enhancedLink) => enhancedLink.node)
+    );
 
     // Collect all document links from the page, filtering out already enhanced nodes
     const documentDocLinks = Array.from(
@@ -105,13 +110,38 @@ export class DocumentLinkManager {
       ...detailsDocLinks,
     ];
     const seen = new Set<HTMLElement>();
+    const seenActionHosts = new Set(
+      this.enhancedLinks
+        .map((enhancedLink) =>
+          this.getDocumentActionHost(enhancedLink.node)
+        )
+        .filter((host): host is HTMLElement => host !== null)
+    );
     const unique = combined.filter((dl) => {
       if (seen.has(dl.node)) return false;
+
+      const actionHost = this.getDocumentActionHost(dl.node);
+      if (actionHost && seenActionHosts.has(actionHost)) return false;
+
       seen.add(dl.node);
+      if (actionHost) seenActionHosts.add(actionHost);
       return true;
     });
 
     return unique;
+  }
+
+  private pruneDetachedLinks(): void {
+    this.enhancedLinks = pruneDisconnectedDocumentLinks(this.enhancedLinks);
+  }
+
+  private getDocumentActionHost(node: HTMLElement): HTMLElement | null {
+    const row = node.parentElement?.closest('tr');
+    return (
+      (row?.querySelector('cc-document-actions')?.parentElement as
+        | HTMLElement
+        | null) ?? null
+    );
   }
 
   /**
@@ -212,32 +242,6 @@ export class DocumentLinkManager {
     }
 
     return docId;
-  }
-
-  /**
-   *  Binds a click event to the document to close the actions container
-   *  when clicking outside of it. This ensures that the actions container
-   *  is closed when the user clicks anywhere outside of the actions container
-   *  or the icon that opens it.
-   */
-  private clickOutsideEventBinding(): void {
-    document.addEventListener('click', (event) => {
-      if (
-        !(event.target as HTMLElement).closest(
-          '.fasterlaw-actions-container, .fasterlaw-icon'
-        )
-      ) {
-        document
-          .querySelectorAll('.fasterlaw-actions-container')
-          .forEach((container) => container?.classList.remove('open'));
-      }
-    });
-
-    window.addEventListener('wheel', () => {
-      document
-        .querySelectorAll('.fasterlaw-actions-container')
-        .forEach((container) => container?.classList.remove('open'));
-    });
   }
 
   /**
