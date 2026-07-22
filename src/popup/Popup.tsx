@@ -20,21 +20,15 @@ const Popup: React.FC = () => {
       pacer_notify_when_archived: true,
     },
   });
-  const [initialValues, setInitialValues] = useState<SettingsSchemaType>({
-    clio_open_docs: true,
-    clio_enhance_docs: true,
-    pacer_auto_save_and_archive: true,
-    pacer_notify_when_archived: true,
-  });
   const [loading, setLoading] = useState(true);
+  const { reset } = form;
 
   useEffect(() => {
     const loadSettings = async () => {
       try {
         const settings = await getSettings();
 
-        form.reset(settings);
-        setInitialValues(settings || initialValues);
+        reset(settings);
       } catch (error) {
         console.error('Error loading settings:', error);
       } finally {
@@ -42,7 +36,7 @@ const Popup: React.FC = () => {
       }
     };
     loadSettings();
-  }, []);
+  }, [reset]);
 
   useEffect(() => {
     const subscription = form.watch(async (data) => {

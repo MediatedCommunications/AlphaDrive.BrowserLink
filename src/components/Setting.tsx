@@ -1,19 +1,18 @@
-import React from 'react';
-import { Control } from 'react-hook-form';
+import { Control, FieldValues, Path } from 'react-hook-form';
 import { FormControl, FormDescription, FormField, FormItem } from './ui/form';
 import { Switch } from './ui/switch';
 
-type Props<TFormValues extends Record<string, any>> = {
+type Props<TFormValues extends FieldValues> = {
   description: string;
-  controlName: keyof TFormValues & string;
-  control: Control<TFormValues, any>;
+  controlName: Path<TFormValues>;
+  control: Control<TFormValues>;
 };
 
-const SettingsContainer: React.FC<Props<any>> = ({
+const SettingsContainer = <TFormValues extends FieldValues>({
   description,
   controlName,
   control,
-}) => {
+}: Props<TFormValues>) => {
   return (
     <FormField
       control={control}
