@@ -1,7 +1,10 @@
 import { Action, DocumentLink, LinkType } from '@/types/clio';
 import { bindDocumentActionsDismissal } from './document-actions-listeners';
 import { EnhancedDocumentLink } from './enhanced-document-link';
-import { pruneDisconnectedDocumentLinks } from './managed-document-links';
+import {
+  hasValidDocumentId,
+  pruneDisconnectedDocumentLinks,
+} from './managed-document-links';
 
 /**
  *  DocumentLinkManager is responsible for managing document links on the page.
@@ -32,8 +35,6 @@ export class DocumentLinkManager {
       this.addActionsToEnhancedLink(enhancedLink);
       this.enhancedLinks.push(enhancedLink);
     });
-
-    console.log(documentLinks);
 
     bindDocumentActionsDismissal(document, window);
   }
@@ -118,6 +119,7 @@ export class DocumentLinkManager {
         .filter((host): host is HTMLElement => host !== null)
     );
     const unique = combined.filter((dl) => {
+      if (!hasValidDocumentId(dl)) return false;
       if (seen.has(dl.node)) return false;
 
       const actionHost = this.getDocumentActionHost(dl.node);
