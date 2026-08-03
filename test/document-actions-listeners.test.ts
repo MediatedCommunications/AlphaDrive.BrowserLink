@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { bindDocumentActionsDismissal } from '../src/lib/document-actions-listeners.ts';
-import { pruneDisconnectedDocumentLinks } from '../src/lib/managed-document-links.ts';
+import {
+  hasValidDocumentId,
+  pruneDisconnectedDocumentLinks,
+} from '../src/lib/managed-document-links.ts';
 
 test('binds document-action dismissal listeners only once per document', () => {
   const registrations = { click: 0, wheel: 0 };
@@ -77,4 +80,10 @@ test('destroys and releases document links after Clio detaches them', () => {
 
   assert.deepEqual(retained.map((link) => link.id), ['connected']);
   assert.deepEqual(destroyed, ['detached']);
+});
+
+test('rejects Clio navigation links without a document ID', () => {
+  assert.equal(hasValidDocumentId({ docID: '1802754888' }), true);
+  assert.equal(hasValidDocumentId({ docID: 'id not found' }), false);
+  assert.equal(hasValidDocumentId({ docID: '' }), false);
 });
