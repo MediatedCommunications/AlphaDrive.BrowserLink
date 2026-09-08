@@ -38,9 +38,10 @@ export const test = base.extend<{ app: App }, { extension: BrowserContext }>({
 
   app: async ({ extension }, provideApp, testInfo) => {
     const worker = extension.serviceWorkers()[0] ?? await extension.waitForEvent('serviceworker');
+    // A fresh Chromium profile can finish extension installation after the worker starts.
     await expect.poll(() => worker.evaluate(async () =>
       (await chrome.storage.local.get('clio_enhance_docs')).clio_enhance_docs
-    )).not.toBeUndefined();
+    ), { timeout: 10_000 }).not.toBeUndefined();
     const settings = async (value: Settings) => {
       await worker.evaluate((value) => chrome.storage.local.set(value), value);
     };
