@@ -33,6 +33,7 @@ const observer = new MutationObserver((mutations) => {
 // Discover once before observing our own DOM additions.
 documentLinkManager.enhanceDocumentLinks();
 observer.observe(document.body, observerConfig);
+window.addEventListener('hashchange', () => documentLinkManager.enhanceDocumentLinks());
 
 // Messaging
 window.addEventListener('message', (message) => {

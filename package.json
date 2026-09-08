@@ -1,7 +1,7 @@
 {
   "name": "faster-suit-ext",
   "private": true,
-  "version": "26.9.7.1",
+  "version": "26.9.8.1",
   "type": "module",
   "license": "MIT",
   "scripts": {

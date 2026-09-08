@@ -6,7 +6,7 @@ import { documentCandidateSelector, documentActionHost, readDocumentLink } from 
 type ManagedLink = { link: EnhancedDocumentLink; id: string; parent: HTMLElement | null; host: HTMLElement | null; type: string };
 
 export class DocumentLinkManager {
-  private path = location.pathname;
+  private path = location.pathname + location.hash;
   private enhancedLinks = new Map<HTMLElement, ManagedLink>();
   private settings = { clio_enhance_docs: false, clio_open_docs: false };
 
@@ -33,9 +33,10 @@ export class DocumentLinkManager {
 
 
   public enhanceDocumentLinks(roots: ParentNode[] = [document]): void {
-    if (this.path !== location.pathname) {
+    const path = location.pathname + location.hash;
+    if (this.path !== path) {
       roots = [document];
-      this.path = location.pathname;
+      this.path = path;
     }
     const candidates = new Set<HTMLElement>();
     for (const root of roots) {

@@ -353,6 +353,76 @@ for (const view of ['recents', 'starred', 'private_documents', 'firm_documents',
   });
 }
 
+for (const route of [
+  '/nc/#/matters/1812792678/document_management',
+  '/nc/#/matters/1812792678/document_management/?tab=starred',
+  '/document_management/matters/1812792678/documents?tab=all',
+  '/document_management/matters/1812792678/documents?tab=recents',
+  '/document_management/matters/1812792678/documents?tab=starred',
+  '/document_management/matters/1812792678/documents?folder_id=20105672253&sort_field=name&sort_direction=asc&folders_first=false&files_only=false',
+  '/nc/#/contacts/1920323911/document_management',
+  '/nc/#/contacts/1920323911/document_management?folder_id=9808598566',
+  '/document_management/contacts/1920323911/documents?tab=all',
+  '/document_management/contacts/1920323911/documents?tab=recents',
+  '/document_management/contacts/1920323911/documents?tab=starred',
+  '/document_management/folders/9808598566',
+]) {
+  test(`contextual Documents shows one file shortcut and targets its document at ${route}`, async ({ app }) => {
+    const folder = readFileSync(new URL('./fixtures/clio-grid-folder.html', import.meta.url), 'utf8');
+    await app.load(`<div role="grid">${capturedRow}${folder}</div>`, 'https://app.clio.com', route);
+    const shortcut = app.page.getByRole('button', { name: 'Faster Suite actions' });
+    await expect(shortcut).toHaveCount(1);
+    await expect(app.page.locator('[row-id="101"] .fasterlaw-icon')).toBeVisible();
+    await shortcut.click();
+    await app.page.getByRole('menuitem', { name: 'Locate', exact: true }).click();
+    await expect.poll(() => app.destinations).toEqual([
+      'alphadrive://localhost/Remoting/custom_actions/documents/locate?subject_url=/api/v4/documents/101',
+    ]);
+    await app.settings({ clio_enhance_docs: false, clio_open_docs: false });
+    await expect(shortcut).toHaveCount(0);
+  });
+}
+
+for (const context of ['matters/1812792678', 'contacts/1920323911']) {
+  test(`contextual Documents reconciles retained rows on hash navigation and history-driven rendering for ${context}`, async ({ app }) => {
+    await app.load(`<div role="grid">${capturedRow}</div>`, 'https://app.clio.com', `/nc/#/${context}/notes`);
+    await expect(app.page.locator('.fasterlaw-icon')).toHaveCount(0);
+    await app.page.evaluate(hash => { location.hash = hash; }, `#/${context}/document_management`);
+    const shortcut = app.page.getByRole('button', { name: 'Faster Suite actions' });
+    await expect(shortcut).toBeVisible();
+    await shortcut.click();
+    await expect(app.page.getByRole('menu')).toBeVisible();
+    await app.page.evaluate(hash => { location.hash = hash; }, `#/${context}/notes`);
+    await expect(app.page.locator('.fasterlaw-icon, .fasterlaw-actions-container')).toHaveCount(0);
+    await app.page.evaluate(hash => {
+      history.replaceState({}, '', hash);
+      document.body.append(document.createElement('aside'));
+    }, `#/${context}/document_management`);
+    await expect(shortcut).toBeVisible();
+    await expect(shortcut).toHaveCount(1);
+  });
+}
+
+for (const route of [
+  '/nc/#/matters/1812792678/notes',
+  '/nc/#/matters/not-an-id/document_management',
+  '/nc/#/matters/1812792678/document_management/trash',
+  '/document_management/trash#/matters/1812792678/document_management',
+  '/document_management/matters/not-an-id/documents',
+  '/document_management/matters/1812792678/documents/trash',
+  '/nc/#/contacts/1920323911/notes',
+  '/nc/#/contacts/not-an-id/document_management',
+  '/nc/#/contacts/1920323911/document_management/dropbox',
+  '/document_management/contacts/not-an-id/documents',
+  '/document_management/contacts/1920323911/documents/trash',
+  '/document_management/trash',
+]) {
+  test(`matter Documents excludes unrelated route ${route} even with a valid file row`, async ({ app }) => {
+    await app.load(`<div role="grid">${capturedRow}</div>`, 'https://app.clio.com', route);
+    await expect(app.page.locator('.fasterlaw-icon')).toHaveCount(0);
+  });
+}
+
 test('a detail shortcut follows its native link when Clio moves it to another container', async ({ app }) => {
   await app.load(`<div id="old"><a class="clio-ui-link" href="#native" x-on:click="$documentsRedirect.handleLauncherClick('true', 'us', '202')">Native details</a></div><div id="new"></div>`);
   await expect(app.page.locator('#old .fasterlaw-details-open-link')).toBeVisible();

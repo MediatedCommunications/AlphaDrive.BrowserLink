@@ -6,6 +6,16 @@ export const documentCandidateSelector = [
   '[role="row"][row-id] [col-id="actions"] button',
 ].join(',');
 
+const globalDocumentRoute = /^\/document_management\/(?:recents|starred|private_documents|firm_documents|contact_documents|matter_documents|folders)(?:\/|$)/;
+const contextualDocumentsRoute = /^\/document_management\/(?:matters|contacts)\/\d+\/documents\/?$/;
+const contextualDocumentsHash = /^#\/(?:matters|contacts)\/\d+\/document_management\/?(?:\?.*)?$/;
+
+function isSupportedDocumentGridRoute(): boolean {
+  if (globalDocumentRoute.test(location.pathname)) return true;
+  if (contextualDocumentsRoute.test(location.pathname)) return true;
+  return location.pathname === '/nc/' && contextualDocumentsHash.test(location.hash);
+}
+
 export function documentActionHost(node: HTMLElement): HTMLElement | null {
   return node.closest('[col-id="actions"]')?.querySelector<HTMLElement>('.inline-flex') ??
     node.closest('tr')?.querySelector('cc-document-actions')?.parentElement ?? null;
@@ -19,7 +29,7 @@ export function readDocumentLink(node: HTMLElement): DocumentLink | null {
   const row = node.closest('[role="row"][row-id]');
   if (row) {
     // Both files and folders use openFileById. Require the independent file route.
-    if (!/^\/document_management\/(?:recents|starred|private_documents|firm_documents|contact_documents|matter_documents|folders)(?:\/|$)/.test(location.pathname)) return null;
+    if (!isSupportedDocumentGridRoute()) return null;
     const match = node.getAttribute('x-on:click.stop')?.match(/^openFileById\((\d+)\)$/);
     const rowId = row.getAttribute('row-id');
     const filePath = row.querySelector('form')?.getAttribute('action')?.split('?')[0];
