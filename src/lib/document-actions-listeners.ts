@@ -2,26 +2,23 @@ const boundDocuments = new WeakSet<Document>();
 
 export function bindDocumentActionsDismissal(
   targetDocument: Document,
-  targetWindow: Window
+  targetWindow: Window,
+  close: (event?: Event) => void
 ): void {
   if (boundDocuments.has(targetDocument)) return;
   boundDocuments.add(targetDocument);
 
-  targetDocument.addEventListener('click', (event) => {
-    if (
-      !(event.target as HTMLElement).closest(
-        '.fasterlaw-actions-container, .fasterlaw-icon'
-      )
-    ) {
-      targetDocument
-        .querySelectorAll('.fasterlaw-actions-container')
-        .forEach((container) => container.classList.remove('open'));
-    }
-  });
-
-  targetWindow.addEventListener('wheel', () => {
-    targetDocument
-      .querySelectorAll('.fasterlaw-actions-container')
-      .forEach((container) => container.classList.remove('open'));
-  });
+  const outside = (event: Event) => {
+    const target = event.target;
+    if (!(target instanceof Element) || !target.closest('.fasterlaw-actions-container, .fasterlaw-icon')) close();
+  };
+  targetDocument.addEventListener('click', outside, true);
+  targetDocument.addEventListener('focusin', outside);
+  targetDocument.addEventListener('scroll', (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest('.fasterlaw-actions-container')) close(event);
+  }, true);
+  targetWindow.addEventListener('wheel', (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest('.fasterlaw-actions-container')) close(event);
+  }, { passive: true });
+  targetWindow.addEventListener('resize', close);
 }

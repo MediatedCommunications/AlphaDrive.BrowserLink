@@ -10,38 +10,29 @@ import './clio.css';
 
 const documentLinkManager = new DocumentLinkManager();
 const toastManager = new ToastManager();
-const observerConfig = { attributes: false, childList: true, subtree: true };
-const observer = new MutationObserver(observerCallback);
-
-// Observing for changes in the DOM
-observer.observe(document.body, observerConfig);
-
-async function observerCallback(
-  _mutationsList: MutationRecord[],
-  observer: MutationObserver
-) {
-  observer.disconnect();
-
-  documentLinkManager.enhanceDocumentLinks();
-
-  // Continue observing for future changes
-  observer.observe(document.body, observerConfig);
-}
-
-// Sub to settings changes
-chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === 'local') {
-    if (changes.clio_enhance_docs) {
-      const newValue = changes.clio_enhance_docs.newValue;
-
-      if (newValue) {
-        documentLinkManager.enableEnhancedLinks();
-      } else {
-        documentLinkManager.disableEnhancedLinks();
-      }
-    }
+const observerConfig: MutationObserverInit = {
+  childList: true, subtree: true, attributes: true,
+  attributeFilter: ['href', 'ui-sref', 'x-on:click', 'x-on:click.stop', 'row-id', 'action', 'id'],
+};
+const observer = new MutationObserver((mutations) => {
+  const roots = new Set<HTMLElement>();
+  for (const mutation of mutations) {
+    const target = mutation.target instanceof HTMLElement ? mutation.target : mutation.target.parentElement;
+    if (!target || target.closest('.fasterlaw-actions-container, .fasterlaw-icon')) continue;
+    const row = target.closest<HTMLElement>('tr, [role="row"][row-id]');
+    if (row) roots.add(row);
+    else if (mutation.type === 'attributes') roots.add(target);
+    else for (const node of mutation.addedNodes) if (node instanceof HTMLElement) roots.add(node);
   }
+  const scopes = Array.from(roots).filter(root => root.isConnected &&
+    !Array.from(roots).some(other => other !== root && other.contains(root)));
+  observer.disconnect();
+  try { documentLinkManager.enhanceDocumentLinks(scopes); }
+  finally { observer.observe(document.body, observerConfig); }
 });
+// Discover once before observing our own DOM additions.
+documentLinkManager.enhanceDocumentLinks();
+observer.observe(document.body, observerConfig);
 
 // Messaging
 window.addEventListener('message', (message) => {

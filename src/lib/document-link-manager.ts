@@ -1,258 +1,77 @@
-import { Action, DocumentLink, LinkType } from '@/types/clio';
+import type { Action } from '@/types/clio';
 import { bindDocumentActionsDismissal } from './document-actions-listeners';
 import { EnhancedDocumentLink } from './enhanced-document-link';
-import {
-  hasValidDocumentId,
-  pruneDisconnectedDocumentLinks,
-} from './managed-document-links';
+import { documentCandidateSelector, documentActionHost, readDocumentLink } from './clio-document-elements';
 
-/**
- *  DocumentLinkManager is responsible for managing document links on the page.
- *  It enhances document links by converting them into EnhancedDocumentLink instances,
- *  adding actions, and binding click events.
- *  It also ensures that links are not enhanced multiple times by checking against
- *  already enhanced nodes.
- */
+type ManagedLink = { link: EnhancedDocumentLink; id: string; parent: HTMLElement | null; host: HTMLElement | null; type: string };
+
 export class DocumentLinkManager {
-  private enhancedLinks: EnhancedDocumentLink[] = [];
+  private path = location.pathname;
+  private enhancedLinks = new Map<HTMLElement, ManagedLink>();
+  private settings = { clio_enhance_docs: false, clio_open_docs: false };
 
-  /**
-   *  Enhances document links on the page by converting them into
-   *  EnhancedDocumentLink instances, adding actions, and binding click events.
-   *  It also ensures that links are not enhanced multiple times by checking
-   *  against already enhanced nodes.
-   *  This method collects all relevant document links from the page,
-   *  enhances them, and sets up the necessary event listeners for interaction.
-   *  It also binds a click event to close the actions container when clicking outside of it.
-   *  This method should be called when the page is ready to ensure all links are processed.
-   */
-  public enhanceDocumentLinks(): void {
-    this.pruneDetachedLinks();
-    const documentLinks = this.getDocumentLinks();
-
-    documentLinks.forEach((documentLink) => {
-      const enhancedLink = new EnhancedDocumentLink(documentLink);
-      this.addActionsToEnhancedLink(enhancedLink);
-      this.enhancedLinks.push(enhancedLink);
-    });
-
-    bindDocumentActionsDismissal(document, window);
-  }
-
-  public enableEnhancedLinks(): void {
-    this.pruneDetachedLinks();
-    this.enhancedLinks.forEach((link) => {
-      link.setEnhance(true);
-    });
-  }
-
-  public disableEnhancedLinks(): void {
-    this.pruneDetachedLinks();
-    this.enhancedLinks.forEach((link) => {
-      link.setEnhance(false);
-    });
-  }
-
-  /**
-   *  Adds actions to the enhanced document link.
-   *  This method creates a set of actions that can be performed on the document link,
-   *  such as opening in a new tab, copying the link, or downloading the document.
-   *  It also binds click events to these actions to perform the corresponding operations.
-   */
-  private getDocumentLinks(): DocumentLink[] {
-    const enhancedNodesSet = new Set(
-      this.enhancedLinks.map((enhancedLink) => enhancedLink.node)
-    );
-
-    // Collect all document links from the page, filtering out already enhanced nodes
-    const documentDocLinks = Array.from(
-      document.querySelectorAll(
-        'a[href*="/download"],a[ng-click*="handleDocumentClick"]'
-      ) as NodeListOf<HTMLElement>
-    )
-      .filter((node) => !enhancedNodesSet.has(node))
-      .filter((node) => !this.isClioMenuDownload(node))
-      .map((node) => this.toDocumentLink(node, 'documents'));
-
-    // Collect links from search results
-    const searchDocLinks = Array.from(
-      document.querySelectorAll(
-        // Exclude main document links that already have a Clio click handler
-        'a[href*="/details"]:not([ng-click*="handleDocumentClick"])'
-      ) as NodeListOf<HTMLElement>
-    )
-      .filter((node) => !enhancedNodesSet.has(node))
-      .map((node) => this.toDocumentLink(node, 'search-results'));
-
-    // Collect links from external documents and details pages
-    const externalDocLinks = Array.from(
-      document.querySelectorAll(
-        `a[href*="/external_documents"`
-      ) as NodeListOf<HTMLElement>
-    )
-      .filter((node) => !enhancedNodesSet.has(node))
-      .map((node) => this.toDocumentLink(node, 'external'));
-
-    // Collect links from details pages with x-on:click attribute
-    // This is for links that are enhanced by Clio's JavaScript
-    // and are not already enhanced by our script
-    const detailsDocLinks = Array.from(
-      document.querySelectorAll('a.clio-ui-link') as NodeListOf<HTMLElement>
-    )
-      .filter((link) => link.hasAttribute('x-on:click'))
-      .filter((node) => !enhancedNodesSet.has(node))
-      .map((node) => this.toDocumentLink(node, 'details'));
-
-    // Merge and de-duplicate by DOM node to avoid enhancing the same link twice
-    const combined = [
-      ...documentDocLinks,
-      ...searchDocLinks,
-      ...externalDocLinks,
-      ...detailsDocLinks,
-    ];
-    const seen = new Set<HTMLElement>();
-    const seenActionHosts = new Set(
-      this.enhancedLinks
-        .map((enhancedLink) =>
-          this.getDocumentActionHost(enhancedLink.node)
-        )
-        .filter((host): host is HTMLElement => host !== null)
-    );
-    const unique = combined.filter((dl) => {
-      if (!hasValidDocumentId(dl)) return false;
-      if (seen.has(dl.node)) return false;
-
-      const actionHost = this.getDocumentActionHost(dl.node);
-      if (actionHost && seenActionHosts.has(actionHost)) return false;
-
-      seen.add(dl.node);
-      if (actionHost) seenActionHosts.add(actionHost);
-      return true;
-    });
-
-    return unique;
-  }
-
-  private pruneDetachedLinks(): void {
-    this.enhancedLinks = pruneDisconnectedDocumentLinks(this.enhancedLinks);
-  }
-
-  private getDocumentActionHost(node: HTMLElement): HTMLElement | null {
-    const row = node.parentElement?.closest('tr');
-    return (
-      (row?.querySelector('cc-document-actions')?.parentElement as
-        | HTMLElement
-        | null) ?? null
-    );
-  }
-
-  /**
-   *  Converts a given HTML element into a DocumentLink object.
-   *  This method extracts the document ID from the element based on its link type
-   *  and returns a DocumentLink object containing the node, document ID, and link type.
-   */
-  private toDocumentLink(node: HTMLElement, linkType: LinkType): DocumentLink {
-    return {
-      node,
-      docID: this.extractDocumentId(node, linkType),
-      linkType,
-    };
-  }
-
-  /**
-   *  Extracts the document ID from the given node based on the link type.
-   *  It uses regular expressions to match the document ID in the href attribute
-   *  or in the x-on:click attribute for details links.
-   *  If no ID is found, it attempts to extract it from the ui-sref attribute
-   *  or from a span element's id attribute.
-   */
-  private extractDocumentId(node: HTMLElement, linkType: LinkType): string {
-    let docId = null;
-
-    switch (linkType) {
-      case 'documents': {
-        const href = node.getAttribute('href');
-        const regex = /\/documents\/(\d+)/;
-        const match = href?.match(regex);
-
-        if (match) {
-          docId = match[1];
+  constructor() {
+    const changed = new Set<string>();
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== 'local') return;
+      for (const key of ['clio_enhance_docs', 'clio_open_docs'] as const) {
+        if (changes[key]) {
+          changed.add(key);
+          this.settings[key] = changes[key].newValue === true;
         }
-        break;
       }
-
-      case 'search-results': {
-        const href = node.getAttribute('href');
-        const regex = /\/documents\/(\d+)\/details/;
-        const match = href?.match(regex);
-
-        if (match) {
-          docId = match[1];
-        }
-
-        break;
+      this.enhancedLinks.forEach(({ link }) => link.setEnhance(this.settings.clio_enhance_docs));
+    });
+    chrome.storage.local.get(['clio_enhance_docs', 'clio_open_docs'], values => {
+      if (chrome.runtime.lastError) return;
+      for (const key of ['clio_enhance_docs', 'clio_open_docs'] as const) {
+        if (!changed.has(key)) this.settings[key] = values[key] === true;
       }
+      this.enhancedLinks.forEach(({ link }) => link.setEnhance(this.settings.clio_enhance_docs));
+    });
+  }
 
-      case 'external': {
-        const href = node.getAttribute('href');
-        const regex = /\/external_documents\/(\d+)/;
-        const match = href?.match(regex);
 
-        if (match) {
-          docId = match[1];
-        }
-        break;
-      }
-
-      case 'details': {
-        const clickHandler = node.getAttribute('x-on:click');
-        const regex =
-          /\$documentsRedirect\.handleLauncherClick\(\s*'true',\s*'[^']*',\s*'(\d+)'/;
-        const match = clickHandler?.match(regex);
-
-        if (match) {
-          docId = match[1];
-        }
-
-        break;
+  public enhanceDocumentLinks(roots: ParentNode[] = [document]): void {
+    if (this.path !== location.pathname) {
+      roots = [document];
+      this.path = location.pathname;
+    }
+    const candidates = new Set<HTMLElement>();
+    for (const root of roots) {
+      if (root instanceof HTMLElement && root.matches(documentCandidateSelector)) candidates.add(root);
+      root.querySelectorAll<HTMLElement>(documentCandidateSelector).forEach(node => candidates.add(node));
+    }
+    const desired = new Map(Array.from(candidates).flatMap(node => {
+      const descriptor = readDocumentLink(node);
+      return descriptor ? [[node, descriptor] as const] : [];
+    }));
+    for (const [node, entry] of this.enhancedLinks) {
+      const affected = roots.some(root => root === node || (root as Node).contains(node));
+      const current = desired.get(node);
+      if (!node.isConnected || (entry.host && !entry.host.isConnected) ||
+          (affected && (!current || node.parentElement !== entry.parent || current.docID !== entry.id || current.linkType !== entry.type ||
+            documentActionHost(node) !== entry.host))) {
+        entry.link.destroy();
+        this.enhancedLinks.delete(node);
       }
     }
-
-    if (!docId) {
-      const docIdRegEx = /{\s?id:\s?(\d+)\s?}/gm;
-      const docIdAttr = node.getAttribute('ui-sref') || '';
-      const docIdMatch = docIdRegEx.exec(docIdAttr);
-
-      if (docIdMatch) {
-        docId = docIdMatch[1];
-      } else {
-        let current: HTMLElement | null = node.parentElement;
-        let attempts = 0;
-
-        // Traverse up the DOM tree to find a span element with an id attribute
-        while (current && attempts < 3) {
-          if (current.tagName.toLowerCase() === 'span') {
-            const id = current.getAttribute('id');
-            if (id) return id;
-            attempts++;
-          }
-          current = current.parentElement;
-        }
-
-        return 'id not found';
-      }
+    const hosts = new Set(Array.from(this.enhancedLinks.values(), entry => entry.host));
+    for (const [node, descriptor] of desired) {
+      const existing = this.enhancedLinks.get(node);
+      if (existing) { existing.link.refreshNativeLauncher(); continue; }
+      const host = documentActionHost(node);
+      if (host && hosts.has(host)) continue;
+      const link = new EnhancedDocumentLink(descriptor, () => this.settings.clio_open_docs,
+        () => readDocumentLink(node)?.docID ?? '');
+      this.addActionsToEnhancedLink(link);
+      link.setEnhance(this.settings.clio_enhance_docs);
+      this.enhancedLinks.set(node, { link, id: descriptor.docID, parent: node.parentElement, host, type: descriptor.linkType });
+      if (host) hosts.add(host);
     }
-
-    return docId;
+    bindDocumentActionsDismissal(document, window, EnhancedDocumentLink.closeActive);
   }
 
-  /**
-   *  Adds predefined actions to the EnhancedDocumentLink instance.
-   *  These actions include opening the document with Faster Suite,
-   *  opening with Clio Launcher, downloading the document, locating
-   *  the document's folder, copying the link, and comparing the document.
-   *  Each action is defined with its name, title, icon, and click handler.
-   */
   private addActionsToEnhancedLink(enhancedLink: EnhancedDocumentLink): void {
     const actions: Action[] = [
       {
@@ -283,7 +102,7 @@ export class DocumentLinkManager {
         text: 'Download',
         onClick: () => {
           window.open(
-            `https://app.clio.com/iris/documents/${enhancedLink.docID}/download`
+            `${window.location.origin}/iris/documents/${enhancedLink.docID}/download`
           );
         },
       },
@@ -321,15 +140,4 @@ export class DocumentLinkManager {
     enhancedLink.addActions(actions);
   }
 
-  private isClioMenuDownload(el: HTMLElement): boolean {
-    const insideDropdown = !!el.closest('.clio-ui-menu[role="menu"]');
-    const isMenuItem = el.getAttribute('role') === 'menuitem';
-
-    // direct-child check
-    const hasDownloadLabel = Array.from(el.children).some(
-      (child) => child.textContent?.trim().toLowerCase() === 'download'
-    );
-
-    return insideDropdown && isMenuItem && hasDownloadLabel;
-  }
 }

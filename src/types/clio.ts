@@ -13,4 +13,4 @@ export interface DocumentLink {
   docID: string;
 }
 
-export type LinkType = 'documents' | 'search-results' | 'external' | 'details';
+export type LinkType = 'grid' | 'documents' | 'search-results' | 'external' | 'details';

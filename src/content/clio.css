@@ -60,145 +60,62 @@ body.auto-print .momane_toast-container {
 
 .fasterlaw-icon-host {
   display: flex !important;
-  align-items: stretch !important;
-  overflow: visible !important;
-  position: relative !important;
+  align-items: center !important;
+  gap: 3px;
 }
 
 .fasterlaw-icon {
-  position: relative;
-  display: inline-block;
+  flex: 0 0 26px;
   width: 26px;
-  min-width: 26px;
-  background-size: contain;
+  height: 28px;
+  box-sizing: border-box;
+  background-size: 16px;
   background-position: center;
   background-repeat: no-repeat;
-  background-origin: content-box;
-  padding: 5px 0;
+  background-color: white;
+  padding: 0;
   cursor: pointer;
   margin: 0;
-  border-top: 1px solid #b0bec5;
-  border-right: 1px solid #b0bec5;
-  border-bottom: 1px solid #b0bec5;
-  border-radius: 0 6px 6px 0;
-}
-
-.fasterlaw-actions-container .title-icon {
-  display: inline-block;
-  margin-right: 8px;
-  width: 16px;
-  height: 16px;
-  background-size: contain;
-  background-repeat: no-repeat;
-}
-
-.fasterlaw-actions-container .fasterlaw-actions-title.action {
-  display: flex;
-  align-items: center;
-  cursor: default;
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-.fasterlaw-actions-container .fasterlaw-actions-title.action:hover {
-  color: #000000;
-  background-color: #ffffff;
-}
-
-/* .fasterlaw-icon.new-ui:before {
-  content: '';
-  position: absolute;
-  top: -3px;
-  left: -6px;
   border: 1px solid #b0bec5;
-  border-radius: 0 3px 3px 0;
-  width: 28px;
-  height: 22px;
-} */
+  border-radius: 4px;
+}
 
 .fasterlaw-actions-container {
-  position: absolute;
-  top: 18px;
-  left: 0;
+  position: fixed;
   display: flex;
-  min-width: 180px;
   flex-direction: column;
-  width: auto;
-  height: auto;
-  opacity: 0;
-  color: #000000;
-  background-color: #ffffff;
-  transition: opacity 0.25s ease-out;
+  width: max-content;
+  overflow: auto;
+  color: #001c37;
+  background: white;
+  border: 1px solid #ccd9e0;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px #001c3720;
   box-sizing: border-box;
-  pointer-events: none;
-}
-
-.fasterlaw-actions-container.open {
-  opacity: 1;
-  border: 1px solid rgb(42, 87, 154);
-  z-index: 1001;
-  pointer-events: all;
+  z-index: 10001;
 }
 
 .fasterlaw-actions-container .action {
   flex: 0 0 auto;
-  padding: 5px 20px;
-  transition: background-color 0.25s ease-in-out, color 0.25s ease-in-out;
-}
-
-.fasterlaw-actions-container .action:hover {
-  color: #ffffff;
-  background-color: rgb(42, 87, 154);
-}
-
-.fasterlaw-actions-container.new-ui {
-  position: absolute;
-  top: 18px;
-  left: 0;
-  display: flex;
-  min-width: 180px;
-  flex-direction: column;
-  width: auto;
-  height: auto;
-  opacity: 0;
-  color: #000000;
-  background-color: #ffffff;
-  transition: opacity 0.25s ease-out;
-  box-sizing: border-box;
-  pointer-events: none;
-}
-
-.fasterlaw-actions-container.new-ui.open {
-  opacity: 1;
-  border: 1px solid #ccd9e0;
-  z-index: 1001;
-  pointer-events: all;
-  border-radius: 0.25rem;
-}
-
-.fasterlaw-actions-container.new-ui .action {
-  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  padding: 0 20px;
-  line-height: 32px;
-  color: #001c37;
-  font-size: 13px;
+  gap: 8px;
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 0;
+  color: inherit;
+  background: transparent;
+  text-align: start;
+  font: 13px/1.4 Arial, sans-serif;
   cursor: pointer;
 }
 
-.fasterlaw-actions-container.new-ui .action.separator {
-  border-bottom: 1px solid #ccd9e0;
-}
-
-.fasterlaw-actions-container.new-ui .action:hover {
-  color: #001c37;
+.fasterlaw-actions-container .action:hover {
   background: #eceff1;
 }
 
 .fasterlaw-actions-container .action-icon {
-  display: inline-block;
-  margin-right: 8px;
+  flex: 0 0 16px;
   width: 16px;
   height: 16px;
   background-size: contain;
@@ -221,4 +138,53 @@ body.auto-print .momane_toast-container {
 
 .fasterlaw-details-open-link-icon {
   color: #006edb;
+}
+
+.fasterlaw-actions-container[hidden],
+.fasterlaw-details-open-link-host > [hidden] {
+  display: none !important;
+}
+
+.fasterlaw-icon:focus-visible,
+.fasterlaw-actions-container .action:focus-visible,
+.fasterlaw-details-open-link:focus-visible {
+  outline: 2px solid #006edb;
+  outline-offset: -2px;
+}
+
+/* Clio's pinned Actions column is 120px wide with 16px cell padding. */
+[col-id="actions"]:has(.fasterlaw-icon-host) {
+  padding-inline: 4px !important;
+}
+
+[col-id="actions"] .fasterlaw-icon-host {
+  gap: 0;
+}
+
+/* Complete Clio's segmented control while the Faster Suite shortcut is present. */
+[col-id="actions"] .fasterlaw-icon-host [data-dms-overflow-trigger] {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+[col-id="actions"] .fasterlaw-icon {
+  margin-inline-start: -1px;
+  border-color: var(--border-color-control, #b0bec5);
+  border-radius: 0;
+  border-start-end-radius: 6px;
+  border-end-end-radius: 6px;
+  background-color: var(--background-color-action-neutral-light, white);
+}
+
+[col-id="actions"] .fasterlaw-icon:hover {
+  background-color: var(--background-color-action-neutral-light-hover, #f0f3f5);
+}
+
+[col-id="actions"] .fasterlaw-icon:active,
+[col-id="actions"] .fasterlaw-icon[aria-expanded="true"] {
+  background-color: var(--background-color-action-neutral-light-active, #e1e7ec);
+}
+
+[col-id="actions"] .fasterlaw-icon:focus-visible {
+  outline-color: var(--border-color-selected, #006edb);
 }

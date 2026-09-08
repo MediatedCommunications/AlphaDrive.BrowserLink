@@ -1,17 +1,18 @@
 {
   "name": "faster-suit-ext",
   "private": true,
-  "version": "26.8.3.1",
+  "version": "26.9.7.1",
   "type": "module",
   "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "check": "npm test && npm run lint && npm run build",
+    "check": "npm test && npm run lint && npm run test:browser",
     "lint": "eslint .",
-    "test": "node --test src/lib/toast-manager.test.ts test/document-actions-listeners.test.ts test/release-packaging.test.cjs",
+    "test": "node --test src/lib/*.test.ts test/*.test.ts test/*.test.cjs",
     "preview": "vite preview",
-    "deploy": "node updateVersionAndZip.cjs"
+    "deploy": "node updateVersionAndZip.cjs",
+    "test:browser": "npm run build && playwright test"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.7.1",
     "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.63.0",
     "@types/chrome": "^0.0.290",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^22.20.1",
